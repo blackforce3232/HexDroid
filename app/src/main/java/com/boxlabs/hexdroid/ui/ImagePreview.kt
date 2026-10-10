@@ -119,7 +119,7 @@ private suspend fun fetchTwitterMeta(data: TwitterUrlData, ctx: Context): Twitte
         val apiUrl = "https://api.fxtwitter.com/${data.username}/status/${data.tweetId}"
         val request = Request.Builder()
             .url(apiUrl)
-            .header("User-Agent", "HexDroid IRC")
+            .header("User-Agent", "Geveze IRC")
             .build()
         httpClient(ctx).newCall(request).execute().use { response ->
             if (!response.isSuccessful) return@use null
@@ -243,7 +243,7 @@ private suspend fun fetchBitmap(url: String, ctx: Context): FetchResult = withCo
     runCatching {
         val request = Request.Builder()
             .url(url)
-            .header("User-Agent", "HexDroid IRC")
+            .header("User-Agent", "Geveze IRC")
             .build()
 
         httpClient(ctx).newCall(request).execute().use { response ->

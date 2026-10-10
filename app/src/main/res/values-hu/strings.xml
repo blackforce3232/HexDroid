@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">HexDroid IRC</string>
+    <string name="app_name">Geveze IRC</string>
 
     <!-- Welcome / Setup Screen -->
-    <string name="welcome_title">Üdvözöl a HexDroid</string>
+    <string name="welcome_title">Üdvözöl a Geveze</string>
     <string name="welcome_subtitle">Mielőtt belevágnánk, lássuk a beállításokat.</string>
     <string name="welcome_language_label">Nyelv</string>
     <string name="welcome_nick_label">Becenév</string>
@@ -229,7 +229,7 @@
 
     <!-- Tour steps -->
     <string name="tour_add_network_title">Hálózataid</string>
-    <string name="tour_add_network_body">Szerver hozzáadásához koppints: +, vagy szerkessz itt meglévőket. A HexDroid alapból tartalmaz néhányat.</string>
+    <string name="tour_add_network_body">Szerver hozzáadásához koppints: +, vagy szerkessz itt meglévőket. A Geveze alapból tartalmaz néhányat.</string>
     <string name="tour_connect_title">Kapcsolódás</string>
     <string name="tour_connect_body">Koppints a Kapcsolódás-ra a csatlakozáshoz. Több hálózathoz is kapcsolódhatsz egyidőben.</string>
     <string name="tour_switcher_title">Puffer lista</string>
@@ -245,8 +245,8 @@
     <string name="tour_send_file_title">Fájlküldés</string>
     <string name="tour_send_file_body">Add meg a címzett becenevét, majd válassz fájt a tárhelyről. A bejövő DCC kérések is ide érkeznek, melyeket értesítésekből elfogadhatsz, vagy elutasíthatsz.</string>
     <string name="tour_support_title">További segítség</string>
-    <string name="tour_support_body">Támogatásért, javaslatokhoz, vagy csak csevegni a többi HexDroid felhasználóval, kapcsolódj az AfterNET szerverhez és lépj be a #HexDroid csatornára.</string>
-    <string name="tour_support_fallback">Az AfterNET még nincs a listádon: támogatásért koppints az AfterNET hozzáadására, majd kapcsolódj és lépj be a #HexDroid csatornára.</string>
+    <string name="tour_support_body">Támogatásért, javaslatokhoz, vagy csak csevegni a többi Geveze felhasználóval, kapcsolódj az AfterNET szerverhez és lépj be a #Geveze csatornára.</string>
+    <string name="tour_support_fallback">Az AfterNET még nincs a listádon: támogatásért koppints az AfterNET hozzáadására, majd kapcsolódj és lépj be a #Geveze csatornára.</string>
     <string name="tour_support_action">AfterNET hozzáadása</string>
     <string name="tour_replay_title">Bemutató újrakezdése</string>
     <string name="tour_replay_body">Az áttekintést bármikor újrakezdheted innen: Beállítások - Névjegy. Befejezéshez koppints erre: Kész</string>
@@ -356,7 +356,7 @@
     <string name="setting_receive_typing">Többiek gépelési jelének megjelenítése</string>
     <string name="setting_receive_typing_desc">Tájékoztatás megjelenítése, amikor valaki más csatornán, vagy privátban üzenetet ír.</string>
     <string name="setting_read_receipts">Olvasási visszaigazolás</string>
-    <string name="setting_read_receipts_desc">Privát üzenetekben jelzi a többieknek, ha elolvastad az üzeneteiket, és mutatja, ha ők elolvasták a tieidet. Csak más HexDroid-felhasználókkal működik.</string>
+    <string name="setting_read_receipts_desc">Privát üzenetekben jelzi a többieknek, ha elolvastad az üzeneteiket, és mutatja, ha ők elolvasták a tieidet. Csak más Geveze-felhasználókkal működik.</string>
 
     <!-- draft/channel-rename -->
     <string name="channel_renamed">A %1$s csatorna átnevezve erre: %2$s</string>
@@ -471,7 +471,7 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="menu_disconnect">Lecsatlakozás</string>
     <string name="menu_exit">Kilépés</string>
     <string name="menu_float">Lebegő ablak</string>
-    <string name="float_needs_permission">Engedélyezd, hogy a HexDroid más alkalmazások fölött jelenjen meg, a lebegő ablak használatához</string>
+    <string name="float_needs_permission">Engedélyezd, hogy a Geveze más alkalmazások fölött jelenjen meg, a lebegő ablak használatához</string>
 
     <!-- ChatScreen tail -->
     <string name="chat_cd_launch_scripts">Szkriptek indítása</string>
@@ -590,15 +590,15 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="network_cert_selected">Választott: %1$s</string>
     <string name="network_cert_none">Nincs kiválasztott tanúsítvány.</string>
     <string name="netcert_title">Tanúsítvány ehhez a hálózathoz</string>
-    <string name="netcert_desc">A HexDroid egy csak ehhez a hálózathoz készült tanúsítványt használ, így SASL EXTERNAL-lal léphetsz be.</string>
+    <string name="netcert_desc">A Geveze egy csak ehhez a hálózathoz készült tanúsítványt használ, így SASL EXTERNAL-lal léphetsz be.</string>
     <string name="netcert_pending">Az első csatlakozáskor jön létre</string>
     <string name="netcert_fingerprint">Ujjlenyomat: %1$s</string>
     <string name="netcert_add_nickserv">Hozzáadás a(z) %1$s-fiókhoz</string>
     <string name="netcert_add_sent">Tanúsítvány elküldve ide: %1$s. Nézd meg a választ a szerverpufferben, majd állítsd a SASL-t EXTERNAL-ra.</string>
     <string name="netcert_not_connected">Előbb csatlakozz ehhez a hálózathoz, és azonosítsd magad a szolgáltatásainál</string>
     <string name="core_netcert_unavailable">*** A hálózat tanúsítványát nem sikerült létrehozni, ezért nélküle csatlakoztál.</string>
-    <string name="core_netcert_created">*** A HexDroid mostantól egy csak ehhez a hálózathoz készült tanúsítványt használ, így SASL EXTERNAL-lal léphetsz be. Ezt a hálózat TLS-tanúsítvány beállításaiban kapcsolhatod ki.</string>
-    <string name="vm_auth_sasl_netcert">Ha a HexDroidot újratelepítették vagy visszaállították, a hálózat tanúsítványa új: azonosítsd magad a jelszavaddal, majd add hozzá újra a fiókodhoz a hálózat tanúsítványbeállításaiban.</string>
+    <string name="core_netcert_created">*** A Geveze mostantól egy csak ehhez a hálózathoz készült tanúsítványt használ, így SASL EXTERNAL-lal léphetsz be. Ezt a hálózat TLS-tanúsítvány beállításaiban kapcsolhatod ki.</string>
+    <string name="vm_auth_sasl_netcert">Ha a Gevezeot újratelepítették vagy visszaállították, a hálózat tanúsítványa új: azonosítsd magad a jelszavaddal, majd add hozzá újra a fiókodhoz a hálózat tanúsítványbeállításaiban.</string>
     <string name="network_cert_pem_hint">A .pem fájl kell tartalmazza mind a tanúsítványt, mind a privát kulcsot.</string>
     <string name="network_cert_choose_pem">PEM választás</string>
     <string name="network_cert_replace_pem">PEM cseréje</string>
@@ -770,7 +770,7 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="about_doc_getting_started">Első lépések</string>
     <string name="about_doc_getting_started_desc">Csatlakozz három lépésben, majd állítsd be a fiókokat és a bouncereket.</string>
     <string name="about_doc_features">Funkciók</string>
-    <string name="about_doc_features_desc">Mit tud a HexDroid, és milyen használni.</string>
+    <string name="about_doc_features_desc">Mit tud a Geveze, és milyen használni.</string>
     <string name="about_doc_reference">Referencia</string>
     <string name="about_doc_reference_desc">Minden IRCv3 képesség és minden beállítás, teljes egészében.</string>
     <string name="about_doc_commands">Parancsok</string>
@@ -884,7 +884,7 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="enc_safety_number">Biztonsági szám</string>
     <string name="enc_verify_match">Ellenőrizd, hogy megegyezik azzal, amit a másik fél lát.</string>
     <string name="enc_cipher">Rejtjel</string>
-    <string name="enc_agm_desc">A HexDroid Authenticated Group Messaging megoldása.  Egyetlen 256 bites véletlen kulcs, üzenetenként hitelesített titkosítás. A kulcsot te osztod meg.</string>
+    <string name="enc_agm_desc">A Geveze Authenticated Group Messaging megoldása.  Egyetlen 256 bites véletlen kulcs, üzenetenként hitelesített titkosítás. A kulcsot te osztod meg.</string>
     <string name="enc_age_desc">Authenticated Group Exchange.  A kulcsok automatikusan egyeztetődnek és előrefelé forognak. Előretitkosítás a privát üzenetekhez.</string>
     <string name="enc_fish_desc">A FiSH-t csak akkor használd, ha a másik fél nem ismeri a +AGM vagy +AGE megoldást.</string>
     <string name="enc_regen">Újragenerálás</string>
@@ -1071,8 +1071,6 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="vm_sts_upgrade">STS: a kiszolgáló TLS-t igényel - biztonságos újracsatlakozás a(z) %1$s porton</string>
     <string name="vm_registered_as">Regisztrálva mint %1$s</string>
     <string name="vm_reconnected">Újracsatlakozva</string>
-    <string name="vm_replay_summary">Visszajátszva %1$s %2$s.</string>
-    <string name="vm_replay_previous_disconnect">Előző kapcsolatbontás: %1$s</string>
     <string name="vm_waiting_autojoin">Várakozás %1$s mp az automatikus belépés &amp; parancsok előtt…</string>
     <string name="vm_waiting">Várakozás %1$s mp…</string>
     <string name="vm_dcc_incoming">Bejövő DCC fájlajánlat tőle: %1$s: %2$s (elfogadás a Fájlátvitelek képernyőn)</string>
@@ -1103,7 +1101,7 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="vm_names_none">NAMES ehhez: %1$s: (nincs)</string>
     <string name="vm_names_header">NAMES ehhez: %1$s (%2$s):</string>
     <string name="vm_log_write_failed">A naplóírás nem sikerült ehhez: %1$s: %2$s</string>
-    <string name="vm_dcc_lan_perm">DCC tőle: %1$s: helyi hálózati engedély szükséges (Android 17+). Add meg itt: Beállítások → Alkalmazások → HexDroid → Engedélyek.</string>
+    <string name="vm_dcc_lan_perm">DCC tőle: %1$s: helyi hálózati engedély szükséges (Android 17+). Add meg itt: Beállítások → Alkalmazások → Geveze → Engedélyek.</string>
     <string name="vm_dcc_accepted_passive">Passzív DCC ajánlat elfogadva: %1$s (figyelés ezen: %2$s)%3$s</string>
     <string name="vm_dcc_resume_requested">DCC RESUME kérve ehhez: %1$s, %2$s bájttól…</string>
     <string name="vm_dcc_resume_agreed">A küldő elfogadta a RESUME kérést %1$s bájtnál (mi %2$s bájtot kértünk)</string>
@@ -1120,7 +1118,7 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="vm_dcc_chat_connected">DCC CHAT kapcsolódva ehhez: %1$s</string>
     <string name="vm_dcc_chat_not_connected">A DCC CHAT nincs kapcsolódva.</string>
     <string name="vm_dcc_chat_send_failed">A DCC CHAT küldés nem sikerült: %1$s</string>
-    <string name="vm_dcc_chat_lan_perm">DCC CHAT tőle: %1$s: helyi hálózati engedély szükséges (Android 17+). Add meg itt: Beállítások → Alkalmazások → HexDroid → Engedélyek.</string>
+    <string name="vm_dcc_chat_lan_perm">DCC CHAT tőle: %1$s: helyi hálózati engedély szükséges (Android 17+). Add meg itt: Beállítások → Alkalmazások → Geveze → Engedélyek.</string>
     <string name="vm_dcc_chat_connecting">DCC CHAT kapcsolódás ehhez: %1$s (%2$s:%3$s)…</string>
     <string name="vm_dcc_chat_connect_failed">A DCC CHAT kapcsolódás nem sikerült: %1$s</string>
     <string name="vm_dcc_chat_rejected">DCC CHAT ajánlat elutasítva tőle: %1$s</string>
@@ -1178,7 +1176,7 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="ok">OK</string>
     <string name="remove">Eltávolítás</string>
     <string name="add">Hozzáadás</string>
-    <string name="about_logo_desc">HexDroid logó</string>
+    <string name="about_logo_desc">Geveze logó</string>
     <string name="about_boxlabs_desc">boxlabs</string>
     <string name="netedit_port_range">A portnak 1 és 65535 között kell lennie</string>
     <string name="netedit_sasl_external">EXTERNAL (kliens tanúsítvány)</string>
@@ -1198,7 +1196,7 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="core_disconnect_server_error">Kiszolgálóhiba: %1$s</string>
     <string name="core_disconnect_tls_fingerprint_changed">A TLS tanúsítvány ujjlenyomata megváltozott</string>
     <string name="core_disconnect_tls_hostname_mismatch">A TLS-tanúsítvány nem érvényes erre a gépre</string>
-    <string name="vm_cert_hostname_grace">A tanúsítvány gépneve nem egyezik: kapcsolódás ide: %1$s, de a tanúsítványt erre állították ki: %2$s. A HexDroid ezt korábban nem ellenőrizte, ezért ezeket a neveket egyszer elfogadtuk, hogy a profil továbbra is működjön, és a kapcsolódás újrapróbálása folyamatban van. Ha erre nem számítottál, nyisd meg a hálózat beállításait, és koppints a „Nevek elfogadásának visszavonása” gombra.</string>
+    <string name="vm_cert_hostname_grace">A tanúsítvány gépneve nem egyezik: kapcsolódás ide: %1$s, de a tanúsítványt erre állították ki: %2$s. A Geveze ezt korábban nem ellenőrizte, ezért ezeket a neveket egyszer elfogadtuk, hogy a profil továbbra is működjön, és a kapcsolódás újrapróbálása folyamatban van. Ha erre nem számítottál, nyisd meg a hálózat beállításait, és koppints a „Nevek elfogadásának visszavonása” gombra.</string>
     <string name="core_disconnect_connect_failed">A kapcsolódás nem sikerült: %1$s</string>
     <string name="core_disconnect_connection_error">Kapcsolódási hiba: %1$s</string>
     <string name="core_disconnect_registration_timeout">Regisztrációs időtúllépés</string>
@@ -1285,7 +1283,7 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="core_reg_hint_invalid_code">(ellenőrizd újra az ellenőrző üzenetben kapott kódot)</string>
     <string name="core_reg_hint_not_connected">(várd meg a teljes kapcsolódást, majd próbáld újra)</string>
     <string name="core_reg_hint_temp_unavailable">(próbáld újra később)</string>
-    <string name="core_age_plaintext_refused">A +AGE be van kapcsolva ehhez: %1$s, de ez az üzenet nem volt titkosítva, ezért NEM lett elküldve (a HexDroid nem küldi ki titkosítatlanul). A normál csevegéshez kapcsold ki itt a +AGE-t.</string>
+    <string name="core_age_plaintext_refused">A +AGE be van kapcsolva ehhez: %1$s, de ez az üzenet nem volt titkosítva, ezért NEM lett elküldve (a Geveze nem küldi ki titkosítatlanul). A normál csevegéshez kapcsold ki itt a +AGE-t.</string>
     <string name="core_nick_still_in_use">%1$s még mindig foglalt; a próbálkozás csendben folyik a háttérben (a bennragadt munkamenet általában néhány percen belül feloldódik).</string>
     <string name="core_nick_gave_up">Feladtuk a becenév visszaszerzését: %1$s, még mindig foglalt. Az újrapróbálkozáshoz használd a /nick %1$s parancsot.</string>
     <string name="core_oversize_line_dropped">Egy túl nagy bejövő IRC sor eldobva (&gt;32 KiB). A kapcsolat megmarad; a további eldobások csendben történnek.</string>
@@ -1808,8 +1806,8 @@ Ez egy új Android 17 követelmény a helyi hálózatodon lévő szerverekhez va
     <string name="notif_reply_hint">Válasz…</string>
     <string name="notif_quit">Kapcsolat bontása</string>
     <string name="notif_reply_not_sent_title">A válasz nem lett elküldve: nincs kapcsolat</string>
-    <string name="notif_reply_not_sent_text">Nyisd meg a HexDroidot, és csatlakozz újra a válasz elküldéséhez ide: %1$s</string>
-    <string name="notif_channel_connection_desc">Kapcsolat állapota, amíg a HexDroid IRC csatlakozva van</string>
+    <string name="notif_reply_not_sent_text">Nyisd meg a Gevezeot, és csatlakozz újra a válasz elküldéséhez ide: %1$s</string>
+    <string name="notif_channel_connection_desc">Kapcsolat állapota, amíg a Geveze IRC csatlakozva van</string>
     <string name="notif_channel_errors">IRC Hibák</string>
     <string name="notif_channel_errors_desc">Szerver- és kapcsolati hibák (csak ha hálózatonként be van kapcsolva)</string>
     <string name="notif_channel_group_networks">IRC Hálózatok</string>

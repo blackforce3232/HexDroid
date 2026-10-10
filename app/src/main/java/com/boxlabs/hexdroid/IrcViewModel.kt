@@ -1,5 +1,5 @@
 /*
-* HexDroidIRC - An IRC Client for Android
+* GevezeUserIRC - An IRC Client for Android
 * Copyright (C) 2026 boxlabs
 *
 * This program is free software: you can redistribute it and/or modify
@@ -364,7 +364,7 @@ data class UiSettings(
     val dccIncomingPortMax: Int = 5010,
     val dccDownloadFolderUri: String? = null,
 
-    val quitMessage: String = "An IRC client for Android - https://hexdroid.org",
+    val quitMessage: String = "Geveze IRC - sohbet devam ediyor",
     val partMessage: String = "Leaving",
 
     val colorizeNicks: Boolean = true,
@@ -820,10 +820,6 @@ class IrcViewModel(
         const val EARLY_ECHO_KEEP_MS = 5_000L
         /** How long a declined script file pick keeps refusing requests the user did not start. */
         const val SCRIPT_PICK_QUIET_MS = 60_000L
-        /** Quiet time after the last replayed line before the replay summary is posted. */
-        const val REPLAY_SUMMARY_QUIET_MS = 4_000L
-        /** How long after registration a replay can begin and still be summarised. */
-        const val REPLAY_SUMMARY_OPEN_MS = 60_000L
         /** How many older messages one "load older" request asks the server for. */
         /**
          * Default upper user-count bound for ELIST range queries when the user hasn't set a max
@@ -1068,22 +1064,6 @@ class IrcViewModel(
      */
     private val everRegisteredThisSession: MutableSet<String> =
         java.util.concurrent.ConcurrentHashMap.newKeySet()
-
-    /** Replayed lines counted since registration, until the summary is posted. */
-    private class ReplayTally(val previousDisconnect: String?) {
-        var lines = 0
-        val buffers = HashSet<String>()
-        var lastAtMs = 0L
-        var job: Job? = null
-    }
-
-    /** Per network, the replay being counted for this connection. */
-    private val replayTallies: MutableMap<String, ReplayTally> =
-        java.util.concurrent.ConcurrentHashMap()
-
-    /** Per network, why the last connection that was up ended. */
-    private val previousDisconnect: MutableMap<String, String> =
-        java.util.concurrent.ConcurrentHashMap()
 
     // Ping-timeout disconnect times per network for flap detection: FLAP_THRESHOLD within
     // FLAP_WINDOW_MS pauses auto-reconnect. Each inner deque is only touched from its own network's
@@ -1857,49 +1837,6 @@ class IrcViewModel(
     /** Pseudo-buffer holding the raw protocol log, alongside the existing "*server*". */
     private val RAW_BUFFER = "*raw*"
 
-    /** Start counting the replay for a connection that has just registered. */
-    private fun openReplayTally(netId: String) {
-        val tally = ReplayTally(previousDisconnect.remove(netId))
-        replayTallies.put(netId, tally)?.job?.cancel()
-        viewModelScope.launch {
-            delay(REPLAY_SUMMARY_OPEN_MS)
-            if (synchronized(tally) { tally.lines == 0 }) replayTallies.remove(netId, tally)
-        }
-    }
-
-    /** Count one replayed line, posting the summary once the replay goes quiet. */
-    private fun noteReplayedLine(netId: String, bufferKey: String) {
-        val tally = replayTallies[netId] ?: return
-        synchronized(tally) {
-            tally.lines++
-            tally.buffers.add(bufferKey)
-            tally.lastAtMs = System.currentTimeMillis()
-            if (tally.job == null) tally.job = viewModelScope.launch { postReplaySummary(netId, tally) }
-        }
-    }
-
-    /** Wait for the replay to go quiet, then post how much it brought in. */
-    private suspend fun postReplaySummary(netId: String, tally: ReplayTally) {
-        while (true) {
-            val wait = synchronized(tally) { tally.lastAtMs + REPLAY_SUMMARY_QUIET_MS } - System.currentTimeMillis()
-            if (wait <= 0) break
-            delay(wait)
-        }
-        if (!replayTallies.remove(netId, tally)) return
-        val (lines, buffers) = synchronized(tally) { tally.lines to tally.buffers.size }
-        val res = appContext.resources
-        val serverKey = bufKey(netId, "*server*")
-        append(serverKey, from = null, doNotify = false, text = "*** " + appContext.getString(
-            R.string.vm_replay_summary,
-            res.getQuantityString(R.plurals.vm_replay_messages, lines, lines),
-            res.getQuantityString(R.plurals.vm_replay_conversations, buffers, buffers),
-        ))
-        tally.previousDisconnect?.let {
-            append(serverKey, from = null, doNotify = false,
-                text = "*** " + appContext.getString(R.string.vm_replay_previous_disconnect, it))
-        }
-    }
-
     /**
      * True for buffers that exist only locally and are not a valid target.
      */
@@ -2589,7 +2526,7 @@ class IrcViewModel(
             // Inherit the nick from an existing network, or fall back to app default.
             val defaultNick = st.networks.firstOrNull()?.nick
                 ?: st.myNick.takeIf { it != "me" }
-                ?: "HexDroidUser"
+                ?: "GevezeUser"
 
             val existing = st.networks.firstOrNull { n ->
                 n.host.equals(ircUri.host, ignoreCase = true) &&
@@ -2628,7 +2565,7 @@ class IrcViewModel(
                     nick = defaultNick,
                     altNick = "${defaultNick}_",
                     username = defaultNick.lowercase(),
-                    realname = "HexDroid IRC",
+                    realname = "Geveze IRC",
                     serverPassword = ircUri.serverPassword,
                     saslEnabled = false,
                     saslMechanism = SaslMechanism.PLAIN,
@@ -3285,14 +3222,14 @@ class IrcViewModel(
                 port = 6697,
                 useTls = true,
                 allowInvalidCerts = true,
-                nick = "HexDroidUser",
-                altNick = "HexDroidUser_",
+                nick = "GevezeUser",
+                altNick = "GevezeUser_",
                 username = "hexdroid",
-                realname = "HexDroid IRC for Android",
+                realname = "Geveze IRC for Android",
                 saslEnabled = false,
                 saslMechanism = SaslMechanism.PLAIN,
                 caps = CapPrefs(),
-                autoJoin = listOf(AutoJoinChannel("#HexDroid", null))
+                autoJoin = listOf(AutoJoinChannel(" #Geveze", null))
             )
 
             repo.upsertNetwork(n)
@@ -3301,13 +3238,13 @@ class IrcViewModel(
 
     /**
      * Update the nick (and altNick) on all default server profiles that still have
-     * the factory-default "HexDroidUser" / "HexDroid" nick. Called from the welcome screen
+     * the factory-default "GevezeUser" / "GevezeUser" nick. Called from the welcome screen
      * so the user's chosen nickname is applied everywhere before they even connect.
      */
     fun updateAllDefaultNetworkNicks(nick: String) {
         viewModelScope.launch {
             val st = _state.value
-            val defaultNicks = setOf("HexDroidUser", "HexDroid", "HexDroidUser_")
+            val defaultNicks = setOf("GevezeUser", "GevezeUser", "GevezeUser_")
             for (net in st.networks) {
                 if (net.nick in defaultNicks) {
                     val updated = net.copy(
@@ -3345,10 +3282,10 @@ fun startAddNetwork() {
 		port = 6697,
 		useTls = true,
 		allowInvalidCerts = false,
-		nick = "HexDroidUser",
-		altNick = "HexDroidUser_",
+		nick = "GevezeUser",
+		altNick = "GevezeUser_",
 		username = "hexdroid",
-		realname = "HexDroid IRC",
+		realname = "Geveze IRC",
 		saslEnabled = false,
 		saslMechanism = SaslMechanism.PLAIN,
 		caps = CapPrefs(),
@@ -5942,7 +5879,7 @@ fun startAddNetwork() {
     }
 
     /**
-     * Called from [HexDroidApp.onActivityStarted] on returning to the foreground. Clears unread and
+     * Called from [GevezeUserApp.onActivityStarted] on returning to the foreground. Clears unread and
      * highlights on the selected buffer (anchoring lastReadTimestamp so the separator stays put),
      * and clears [appExitRequested] so auto-reconnect works again.
      */
@@ -7425,11 +7362,9 @@ fun startAddNetwork() {
             }
             is IrcEvent.Disconnected -> {
                 // Only for a connection that was up: a failed connect attempt isn't a disconnect.
-                val wasUp = _state.value.connections[netId]?.connected == true
-                if (wasUp) {
+                if (_state.value.connections[netId]?.connected == true) {
                     scriptEvent("DISCONNECT", netId, "*server*", text = ev.reason.orEmpty(), isMe = true)
                 }
-                replayTallies.remove(netId)?.job?.cancel()
                 rescheduleStsOnClose(netId)
                 ageBridges[netId]?.onConnectionLost()
                 // A disconnect cancels the stability timer so a short-lived session
@@ -7458,10 +7393,6 @@ fun startAddNetwork() {
                     appendConnStatus(netId, pretty, from = "ERROR", doNotify = false, isHighlight = false, broadcast = true)
                 } else {
                     appendConnStatus(netId, "*** $pretty", from = null, doNotify = false, isHighlight = false, broadcast = true)
-                }
-                if (wasUp) {
-                    if (code == DisconnectCode.USER_QUIT) previousDisconnect.remove(netId)
-                    else previousDisconnect[netId] = r?.takeIf { it.isNotBlank() && code != DisconnectCode.EOF } ?: disconnectedLabel
                 }
                 setNetConn(netId) { it.copy(connecting = false, connected = false, status = pretty, lagMs = null) }
                 if (_state.value.activeNetworkId == netId) clearConnectionNotification()
@@ -8130,8 +8061,6 @@ if (code == "442") {
                         broadcast = true,
                     )
                 }
-
-                openReplayTally(netId)
 
                 // Successful registration is the natural reset point for connection-status
                 // dedup: if the connection drops AGAIN for the same reason after this, the
@@ -10195,7 +10124,7 @@ if (code == "442") {
             }
 
             is IrcEvent.CtcpRequest -> {
-                // Scripts only: HexDroid answers the CTCPs it knows itself. Ignored nicks never
+                // Scripts only: GevezeUser answers the CTCPs it knows itself. Ignored nicks never
                 // reach scripts, as for messages and notices.
                 if (!ev.isHistory && !isNickIgnored(netId, ev.from)) {
                     val inChannel = isChannelOnNet(netId, ev.target)
@@ -11681,9 +11610,6 @@ if (code == "442") {
         // Advance the boundary only for a committed replay: a deduplicated one would
         // describe a message the user cannot see.
         if (isHistory) chatHistory.noteReplay(bufferKey, ts)
-        if ((isHistory || staleLive) && !isLocal && !isPseudoBuffer(splitKey(bufferKey).second)) {
-            noteReplayedLine(selfNetId, bufferKey)
-        }
 
         // The upper end of any gap this session has to fill. Only a message the server sent
         // will do: a local line has no msgid and a clock the server never saw.
@@ -13485,7 +13411,7 @@ private fun moveNickAcrossChannels(netId: String, oldNick: String, newNick: Stri
 
         val gpu = cachedGpu ?: readGpuRendererBestEffort().also { cachedGpu = it }
 
-        return "HexDroid v${BuildConfig.VERSION_NAME} | " +
+        return "GevezeUser v${BuildConfig.VERSION_NAME} | " +
             "Device: $device running Android $release $codename (API $api), CPU: ${cpuCores}-core $cpuModel, " +
             "Memory: ${fmtBytes(totalMem)} total, ${fmtBytes(usedMem)} (${fmtPct(usedMemPct)}) used, ${fmtBytes(availMem)} (${fmtPct(1.0 - usedMemPct)}) free, " +
             "Storage: ${fmtBytes(totalStorage)} total, ${fmtBytes(usedStorage)} (${fmtPct(usedStoPct)}) used, ${fmtBytes(freeStorage)} (${fmtPct(1.0 - usedStoPct)}) free, " +

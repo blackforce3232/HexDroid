@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Adaptive icon foreground — wraps the mipmap bitmap so the drawable-v24
-    foreground slot always resolves to the real HexDroid artwork.
+    foreground slot always resolves to the real Geveze artwork.
     The adaptive icon XMLs in mipmap-anydpi-v26 already point at
     @mipmap/ic_launcher_foreground (the .webp), so this XML is only
     reached by tools / previews that look for a drawable; having it

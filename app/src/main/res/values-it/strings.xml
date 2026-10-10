@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">HexDroid IRC</string>
+    <string name="app_name">Geveze IRC</string>
 
     <!-- Welcome / Setup Screen -->
-    <string name="welcome_title">Benvenuto in HexDroid</string>
+    <string name="welcome_title">Benvenuto in Geveze</string>
     <string name="welcome_subtitle">Configuriamo tutto prima di iniziare.</string>
     <string name="welcome_language_label">Lingua</string>
     <string name="welcome_nick_label">Nickname</string>
@@ -229,7 +229,7 @@
 
     <!-- Tour steps -->
     <string name="tour_add_network_title">Le tue reti</string>
-    <string name="tour_add_network_body">Tocca + per aggiungere un server o modificare quelli esistenti. HexDroid include alcune reti predefinite.</string>
+    <string name="tour_add_network_body">Tocca + per aggiungere un server o modificare quelli esistenti. Geveze include alcune reti predefinite.</string>
     <string name="tour_connect_title">Connetti</string>
     <string name="tour_connect_body">Tocca Connetti per aprire una connessione. Puoi avere più reti connesse contemporaneamente.</string>
     <string name="tour_switcher_title">Elenco buffer</string>
@@ -245,8 +245,8 @@
     <string name="tour_send_file_title">Invia un file</string>
     <string name="tour_send_file_body">Inserisci il nick destinatario, poi scegli un file dallo storage. Le offerte DCC in arrivo appaiono qui, accettale o rifiutale dalle notifiche.</string>
     <string name="tour_support_title">Hai bisogno di aiuto?</string>
-    <string name="tour_support_body">Connettiti ad AfterNET e unisciti a #HexDroid per supporto, richieste di funzionalità o per chattare con altri utenti.</string>
-    <string name="tour_support_fallback">AfterNET non è ancora nel tuo elenco: tocca Aggiungi AfterNET per aggiungerlo, poi connettiti e unisciti a #HexDroid.</string>
+    <string name="tour_support_body">Connettiti ad AfterNET e unisciti a #Geveze per supporto, richieste di funzionalità o per chattare con altri utenti.</string>
+    <string name="tour_support_fallback">AfterNET non è ancora nel tuo elenco: tocca Aggiungi AfterNET per aggiungerlo, poi connettiti e unisciti a #Geveze.</string>
     <string name="tour_support_action">Aggiungi AfterNET</string>
     <string name="tour_replay_title">Ripeti questo tour</string>
     <string name="tour_replay_body">Puoi riavviare la guida quando vuoi da Impostazioni → Informazioni. Tocca Fatto per terminare.</string>
@@ -356,7 +356,7 @@
     <string name="setting_receive_typing">Mostra indicatori di digitazione degli altri</string>
     <string name="setting_receive_typing_desc">Mostra un indicatore quando qualcun altro sta scrivendo in un canale o in privato.</string>
     <string name="setting_read_receipts">Conferme di lettura</string>
-    <string name="setting_read_receipts_desc">Nei messaggi privati fa sapere agli altri quando hai letto i loro messaggi e mostra quando hanno letto i tuoi. Funziona solo con altri utenti HexDroid.</string>
+    <string name="setting_read_receipts_desc">Nei messaggi privati fa sapere agli altri quando hai letto i loro messaggi e mostra quando hanno letto i tuoi. Funziona solo con altri utenti Geveze.</string>
 
     <!-- draft/channel-rename -->
     <string name="channel_renamed">Canale rinominato da %1$s in %2$s</string>
@@ -471,7 +471,7 @@
     <string name="menu_disconnect">Disconnetti</string>
     <string name="menu_exit">Esci</string>
     <string name="menu_float">Finestra mobile</string>
-    <string name="float_needs_permission">Consenti a HexDroid di apparire sopra le altre app per usare la finestra mobile</string>
+    <string name="float_needs_permission">Consenti a Geveze di apparire sopra le altre app per usare la finestra mobile</string>
 
     <!-- ChatScreen tail -->
     <string name="chat_cd_launch_scripts">Avvia gli script</string>
@@ -590,15 +590,15 @@
     <string name="network_cert_selected">Selezionato: %1$s</string>
     <string name="network_cert_none">Nessun certificato selezionato.</string>
     <string name="netcert_title">Certificato per questa rete</string>
-    <string name="netcert_desc">HexDroid presenta un certificato creato solo per questa rete, così puoi accedere con SASL EXTERNAL.</string>
+    <string name="netcert_desc">Geveze presenta un certificato creato solo per questa rete, così puoi accedere con SASL EXTERNAL.</string>
     <string name="netcert_pending">Creato alla prima connessione</string>
     <string name="netcert_fingerprint">Impronta: %1$s</string>
     <string name="netcert_add_nickserv">Aggiungi all\'account %1$s</string>
     <string name="netcert_add_sent">Certificato inviato a %1$s. Controlla la risposta nel buffer del server, poi imposta SASL su EXTERNAL.</string>
     <string name="netcert_not_connected">Prima connettiti a questa rete e identificati con i suoi servizi</string>
     <string name="core_netcert_unavailable">*** Non è stato possibile creare il certificato di questa rete, quindi sei connesso senza.</string>
-    <string name="core_netcert_created">*** HexDroid ora presenta un certificato creato solo per questa rete, così puoi accedere con SASL EXTERNAL. Puoi disattivarlo nelle impostazioni del certificato TLS della rete.</string>
-    <string name="vm_auth_sasl_netcert">Se HexDroid è stato reinstallato o ripristinato, il certificato di questa rete è nuovo: identificati con la password, poi aggiungilo di nuovo al tuo account dalle impostazioni del certificato della rete.</string>
+    <string name="core_netcert_created">*** Geveze ora presenta un certificato creato solo per questa rete, così puoi accedere con SASL EXTERNAL. Puoi disattivarlo nelle impostazioni del certificato TLS della rete.</string>
+    <string name="vm_auth_sasl_netcert">Se Geveze è stato reinstallato o ripristinato, il certificato di questa rete è nuovo: identificati con la password, poi aggiungilo di nuovo al tuo account dalle impostazioni del certificato della rete.</string>
     <string name="network_cert_pem_hint">Il .pem deve includere sia il certificato che la chiave privata.</string>
     <string name="network_cert_choose_pem">Scegli .pem / .crt / .cer</string>
     <string name="network_cert_replace_pem">Sostituisci .pem / .crt / .cer</string>
@@ -770,7 +770,7 @@
     <string name="about_doc_getting_started">Per iniziare</string>
     <string name="about_doc_getting_started_desc">Connettiti in tre passaggi, poi configura account e bouncer.</string>
     <string name="about_doc_features">Funzionalità</string>
-    <string name="about_doc_features_desc">Cosa fa HexDroid e com\'è usarlo.</string>
+    <string name="about_doc_features_desc">Cosa fa Geveze e com\'è usarlo.</string>
     <string name="about_doc_reference">Riferimento</string>
     <string name="about_doc_reference_desc">Ogni capacità IRCv3 e ogni impostazione, per intero.</string>
     <string name="about_doc_commands">Comandi</string>
@@ -884,7 +884,7 @@
     <string name="enc_safety_number">Numero di sicurezza</string>
     <string name="enc_verify_match">Verifica che corrisponda a quello che vede l\'altra parte.</string>
     <string name="enc_cipher">Cifrario</string>
-    <string name="enc_agm_desc">Authenticated Group Messaging di HexDroid.  Una chiave casuale a 256 bit, cifratura autenticata per ogni messaggio. La chiave la condividi tu.</string>
+    <string name="enc_agm_desc">Authenticated Group Messaging di Geveze.  Una chiave casuale a 256 bit, cifratura autenticata per ogni messaggio. La chiave la condividi tu.</string>
     <string name="enc_age_desc">Authenticated Group Exchange.  Le chiavi vengono negoziate automaticamente e ruotano in avanti. Forward secrecy per i messaggi privati.</string>
     <string name="enc_fish_desc">Usa FiSH solo se l\'altra parte non supporta +AGM o +AGE.</string>
     <string name="enc_regen">Rigenera</string>
@@ -1071,8 +1071,6 @@
     <string name="vm_sts_upgrade">STS: il server richiede TLS - riconnessione sicura sulla porta %1$s</string>
     <string name="vm_registered_as">Registrato come %1$s</string>
     <string name="vm_reconnected">Riconnesso</string>
-    <string name="vm_replay_summary">Cronologia recuperata: %1$s da %2$s.</string>
-    <string name="vm_replay_previous_disconnect">Disconnessione precedente: %1$s</string>
     <string name="vm_waiting_autojoin">Attesa di %1$ss prima dell\'ingresso automatico &amp; dei comandi…</string>
     <string name="vm_waiting">Attesa di %1$ss…</string>
     <string name="vm_dcc_incoming">Offerta di file DCC in arrivo da %1$s: %2$s (apri la schermata dei trasferimenti per accettare)</string>
@@ -1103,7 +1101,7 @@
     <string name="vm_names_none">NAMES per %1$s: (nessuno)</string>
     <string name="vm_names_header">NAMES per %1$s (%2$s):</string>
     <string name="vm_log_write_failed">Scrittura del log non riuscita per %1$s: %2$s</string>
-    <string name="vm_dcc_lan_perm">DCC da %1$s: è necessaria l\'autorizzazione per la rete locale (Android 17+). Concedila in Impostazioni → App → HexDroid → Autorizzazioni.</string>
+    <string name="vm_dcc_lan_perm">DCC da %1$s: è necessaria l\'autorizzazione per la rete locale (Android 17+). Concedila in Impostazioni → App → Geveze → Autorizzazioni.</string>
     <string name="vm_dcc_accepted_passive">Offerta DCC passiva accettata: %1$s (in ascolto su %2$s)%3$s</string>
     <string name="vm_dcc_resume_requested">DCC RESUME richiesto per %1$s a %2$s byte…</string>
     <string name="vm_dcc_resume_agreed">Il mittente ha accettato RESUME a %1$s byte (ne avevamo richiesti %2$s)</string>
@@ -1120,7 +1118,7 @@
     <string name="vm_dcc_chat_connected">DCC CHAT connesso a %1$s</string>
     <string name="vm_dcc_chat_not_connected">DCC CHAT non connesso.</string>
     <string name="vm_dcc_chat_send_failed">Invio nel DCC CHAT non riuscito: %1$s</string>
-    <string name="vm_dcc_chat_lan_perm">DCC CHAT da %1$s: è necessaria l\'autorizzazione per la rete locale (Android 17+). Concedila in Impostazioni → App → HexDroid → Autorizzazioni.</string>
+    <string name="vm_dcc_chat_lan_perm">DCC CHAT da %1$s: è necessaria l\'autorizzazione per la rete locale (Android 17+). Concedila in Impostazioni → App → Geveze → Autorizzazioni.</string>
     <string name="vm_dcc_chat_connecting">Connessione DCC CHAT a %1$s (%2$s:%3$s)…</string>
     <string name="vm_dcc_chat_connect_failed">Connessione DCC CHAT non riuscita: %1$s</string>
     <string name="vm_dcc_chat_rejected">Offerta DCC CHAT da %1$s rifiutata</string>
@@ -1178,7 +1176,7 @@
     <string name="ok">OK</string>
     <string name="remove">Rimuovi</string>
     <string name="add">Aggiungi</string>
-    <string name="about_logo_desc">Logo di HexDroid</string>
+    <string name="about_logo_desc">Logo di Geveze</string>
     <string name="about_boxlabs_desc">boxlabs</string>
     <string name="netedit_port_range">La porta deve essere compresa tra 1 e 65535</string>
     <string name="netedit_sasl_external">EXTERNAL (certificato client)</string>
@@ -1198,7 +1196,7 @@
     <string name="core_disconnect_server_error">Errore del server: %1$s</string>
     <string name="core_disconnect_tls_fingerprint_changed">L\'impronta del certificato TLS è cambiata</string>
     <string name="core_disconnect_tls_hostname_mismatch">Il certificato TLS non è valido per questo host</string>
-    <string name="vm_cert_hostname_grace">Nome host del certificato non corrispondente: connesso a %1$s ma il certificato è emesso per: %2$s. HexDroid prima non lo controllava, quindi questi nomi sono stati accettati una volta per far continuare a funzionare questo profilo, e la connessione viene ritentata. Se non te lo aspettavi, apri le impostazioni della rete e tocca «Non considerare più attendibili questi nomi».</string>
+    <string name="vm_cert_hostname_grace">Nome host del certificato non corrispondente: connesso a %1$s ma il certificato è emesso per: %2$s. Geveze prima non lo controllava, quindi questi nomi sono stati accettati una volta per far continuare a funzionare questo profilo, e la connessione viene ritentata. Se non te lo aspettavi, apri le impostazioni della rete e tocca «Non considerare più attendibili questi nomi».</string>
     <string name="core_disconnect_connect_failed">Connessione non riuscita: %1$s</string>
     <string name="core_disconnect_connection_error">Errore di connessione: %1$s</string>
     <string name="core_disconnect_registration_timeout">Timeout della registrazione</string>
@@ -1285,7 +1283,7 @@
     <string name="core_reg_hint_invalid_code">(ricontrolla il codice nel messaggio di verifica)</string>
     <string name="core_reg_hint_not_connected">(attendi la connessione completa, poi riprova)</string>
     <string name="core_reg_hint_temp_unavailable">(riprova più tardi)</string>
-    <string name="core_age_plaintext_refused">+AGE è attivo per %1$s ma questo messaggio non era cifrato, quindi NON è stato inviato (HexDroid non lo trasmette in chiaro). Disattiva +AGE qui per chattare normalmente.</string>
+    <string name="core_age_plaintext_refused">+AGE è attivo per %1$s ma questo messaggio non era cifrato, quindi NON è stato inviato (Geveze non lo trasmette in chiaro). Disattiva +AGE qui per chattare normalmente.</string>
     <string name="core_nick_still_in_use">%1$s è ancora in uso; nuovi tentativi in background senza avvisi (una sessione rimasta appesa si libera di solito in pochi minuti).</string>
     <string name="core_nick_gave_up">Tentativi di recuperare %1$s abbandonati, è ancora in uso. Usa /nick %1$s per riprovare.</string>
     <string name="core_oversize_line_dropped">Scartata una riga IRC in arrivo troppo grande (&gt;32 KiB). Connessione mantenuta attiva; gli scarti successivi saranno silenziosi.</string>
@@ -1808,8 +1806,8 @@
     <string name="notif_reply_hint">Rispondi…</string>
     <string name="notif_quit">Disconnetti</string>
     <string name="notif_reply_not_sent_title">Risposta non inviata: non connesso</string>
-    <string name="notif_reply_not_sent_text">Apri HexDroid e riconnettiti per inviare la tua risposta a %1$s</string>
-    <string name="notif_channel_connection_desc">Stato della connessione mentre HexDroid IRC è connesso</string>
+    <string name="notif_reply_not_sent_text">Apri Geveze e riconnettiti per inviare la tua risposta a %1$s</string>
+    <string name="notif_channel_connection_desc">Stato della connessione mentre Geveze IRC è connesso</string>
     <string name="notif_channel_errors">Errori IRC</string>
     <string name="notif_channel_errors_desc">Errori del server e di connessione (solo se attivati per rete)</string>
     <string name="notif_channel_group_networks">Reti IRC</string>

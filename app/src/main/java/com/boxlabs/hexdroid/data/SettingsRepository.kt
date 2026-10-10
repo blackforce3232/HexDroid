@@ -35,8 +35,8 @@ private val Context.dataStore by preferencesDataStore(name = "hexdroid_prefs")
  * Update older defaulted quit messages
  */
 private val LEGACY_DEFAULT_QUIT_MESSAGES = setOf(
-    "HexDroid IRC - https://hexdroid.boxlabs.uk",
-    "HexDroid IRC - https://hexdroid.boxlabs.uk/",
+    "Geveze IRC - https://hexdroid.boxlabs.uk",
+    "Geveze IRC - https://hexdroid.boxlabs.uk/",
 )
 
 class SettingsRepository(private val ctx: Context) {
@@ -138,7 +138,7 @@ class SettingsRepository(private val ctx: Context) {
 }
 
     /**
-     * rewrite a defaulted quit message so new versions are updated to use hexdroid.org
+     * rewrite a defaulted quit message so new versions are updated to use geveze.org
      */
     suspend fun migrateLegacyQuitMessageIfNeeded() {
         ctx.dataStore.edit { prefs ->
@@ -520,10 +520,10 @@ class SettingsRepository(private val ctx: Context) {
                         tlsClientCertLabel = o.optString("tlsClientCertLabel", "").takeIf { it.isNotBlank() },
                         autoClientCert = o.optBoolean("autoClientCert", true),
     
-                        nick = o.optString("nick", "HexDroidUser"),
+                        nick = o.optString("nick", "GevezeUser"),
                         altNick = o.optString("altNick", "").takeIf { it.isNotBlank() },
                         username = o.optString("username", "hexdroid"),
-                        realname = o.optString("realname", "HexDroid IRC"),
+                        realname = o.optString("realname", "Geveze IRC"),
     
                         saslEnabled = o.optBoolean("saslEnabled", false),
                         saslMechanism = runCatching {
@@ -775,143 +775,44 @@ class SettingsRepository(private val ctx: Context) {
 
     private fun defaultNetworks(): List<NetworkProfile> = listOf(
         NetworkProfile(
-            id = "AfterNET",
-            name = "AfterNET",
-            host = "irc.afternet.org",
-            port = 6697,
-            useTls = true,
+            id = "Geveze",
+            name = "Geveze",
+            host = "irc.geveze.org",
+            port = 6667,
+            useTls = false,
             allowInvalidCerts = false,
             serverPassword = null,
-            nick = "HexDroidUser",
-            altNick = "HexDroidUser",
-            username = "hexdroid",
-            realname = "HexDroid IRC for Android",
+            nick = "GevezeUser",
+            altNick = "GevezeUser_",
+            username = "geveze",
+            realname = "Geveze IRC",
             saslEnabled = false,
             saslMechanism = SaslMechanism.PLAIN,
             saslAuthcid = null,
             saslPassword = null,
             caps = CapPrefs(),
-            autoJoin = listOf(AutoJoinChannel("#hexdroid", null))
+            autoJoin = listOf(AutoJoinChannel("#Geveze", null)),
+            autoConnect = true,
         ),
         NetworkProfile(
-            id = "Libera",
-            name = "Libera.Chat",
-            host = "irc.libera.chat",
-            port = 6697,
-            useTls = true,
+            id = "TRSohbet",
+            name = "TRSohbet",
+            host = "irc.trsohbet.com",
+            port = 6667,
+            useTls = false,
             allowInvalidCerts = false,
             serverPassword = null,
-            nick = "HexDroidUser",
-            altNick = "HexDroidUser",
-            username = "hexdroid",
-            realname = "HexDroid IRC for Android",
+            nick = "GevezeUser",
+            altNick = "GevezeUser_",
+            username = "geveze",
+            realname = "Geveze IRC",
             saslEnabled = false,
             saslMechanism = SaslMechanism.PLAIN,
             saslAuthcid = null,
             saslPassword = null,
             caps = CapPrefs(),
             autoJoin = emptyList(),
-            showInSidebar = false
-        ),
-        NetworkProfile(
-            id = "Rizon",
-            name = "Rizon",
-            host = "irc.rizon.net",
-            port = 6697,
-            useTls = true,
-            allowInvalidCerts = false,
-            serverPassword = null,
-            nick = "HexDroid",
-            altNick = "HexDroidUser",
-            username = "hexdroid",
-            realname = "HexDroid IRC for Android",
-            saslEnabled = false,
-            saslMechanism = SaslMechanism.PLAIN,
-            saslAuthcid = null,
-            saslPassword = null,
-            caps = CapPrefs(),
-            autoJoin = emptyList(),
-            showInSidebar = false
-        ),
-        NetworkProfile(
-            id = "Undernet",
-            name = "Undernet",
-            host = "irc.undernet.org",
-            port = 6697,
-            useTls = true,
-            allowInvalidCerts = false,
-            serverPassword = null,
-            nick = "HexDroid",
-            altNick = "HexDroidUser",
-            username = "hexdroid",
-            realname = "HexDroid IRC for Android",
-            saslEnabled = false,
-            saslMechanism = SaslMechanism.PLAIN,
-            saslAuthcid = null,
-            saslPassword = null,
-            caps = CapPrefs(),
-            autoJoin = emptyList(),
-            showInSidebar = false
-        ),
-        NetworkProfile(
-            id = "EFnet",
-            name = "EFnet",
-            host = "irc.efnet.org",
-            port = 6697,
-            useTls = true,
-            allowInvalidCerts = false,
-            serverPassword = null,
-            nick = "HexDroid",
-            altNick = "HexDroidUser",
-            username = "hexdroid",
-            realname = "HexDroid IRC for Android",
-            saslEnabled = false,
-            saslMechanism = SaslMechanism.PLAIN,
-            saslAuthcid = null,
-            saslPassword = null,
-            caps = CapPrefs(),
-            autoJoin = emptyList(),
-            showInSidebar = false
-        ),
-        NetworkProfile(
-            id = "QuakeNet",
-            name = "QuakeNet",
-            host = "irc.quakenet.org",
-            port = 6697,
-            useTls = true,
-            allowInvalidCerts = false,
-            serverPassword = null,
-            nick = "HexDroid",
-            altNick = "HexDroidUser",
-            username = "hexdroid",
-            realname = "HexDroid IRC for Android",
-            saslEnabled = false,
-            saslMechanism = SaslMechanism.PLAIN,
-            saslAuthcid = null,
-            saslPassword = null,
-            caps = CapPrefs(),
-            autoJoin = emptyList(),
-            showInSidebar = false
-        ),
-        NetworkProfile(
-            id = "DALnet",
-            name = "DALnet",
-            host = "irc.dal.net",
-            port = 6697,
-            useTls = true,
-            allowInvalidCerts = false,
-            serverPassword = null,
-            nick = "HexDroid",
-            altNick = "HexDroidUser",
-            username = "hexdroid",
-            realname = "HexDroid IRC for Android",
-            saslEnabled = false,
-            saslMechanism = SaslMechanism.PLAIN,
-            saslAuthcid = null,
-            saslPassword = null,
-            caps = CapPrefs(),
-            autoJoin = emptyList(),
-            showInSidebar = false
+            autoConnect = false,
         )
     )
 
@@ -941,7 +842,7 @@ class SettingsRepository(private val ctx: Context) {
         //   an older build would silently change behaviour.
         root.put("version", 5)
         root.put("minCompatVersion", 1)
-        root.put("app", "HexDroid")
+        root.put("app", "GevezeUser")
         root.put("exportedAt", java.time.Instant.now().toString())
         root.put("note", "Passwords and TLS certificates are not included in the backup.")
         root.put("schemaChanges", org.json.JSONArray(listOf(
@@ -979,7 +880,7 @@ class SettingsRepository(private val ctx: Context) {
         val appBackupVersion = 4  // this build's highest supported backup version
         if (minCompat > appBackupVersion) {
             throw IllegalArgumentException(
-                "This backup requires a newer version of HexDroid (backup minCompatVersion=$minCompat, app supports up to $appBackupVersion). Please update the app."
+                "This backup requires a newer version of GevezeUser (backup minCompatVersion=$minCompat, app supports up to $appBackupVersion). Please update the app."
             )
         }
         // version > appBackupVersion but minCompat <= appBackupVersion:

@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">HexDroid IRC</string>
+    <string name="app_name">Geveze IRC</string>
 
     <!-- Welcome / Setup Screen -->
-    <string name="welcome_title">HexDroid에 오신 것을 환영합니다</string>
+    <string name="welcome_title">Geveze에 오신 것을 환영합니다</string>
     <string name="welcome_subtitle">시작하기 전에 설정을 완료해 주세요.</string>
     <string name="welcome_language_label">언어</string>
     <string name="welcome_nick_label">닉네임</string>
@@ -229,7 +229,7 @@
 
     <!-- Tour steps -->
     <string name="tour_add_network_title">내 네트워크</string>
-    <string name="tour_add_network_body">+를 탭하여 서버를 추가하거나 기존 항목을 편집하세요. HexDroid에는 몇 가지 기본값이 포함되어 있습니다.</string>
+    <string name="tour_add_network_body">+를 탭하여 서버를 추가하거나 기존 항목을 편집하세요. Geveze에는 몇 가지 기본값이 포함되어 있습니다.</string>
     <string name="tour_connect_title">연결</string>
     <string name="tour_connect_body">연결을 탭하여 연결을 엽니다. 여러 네트워크를 동시에 연결할 수 있습니다.</string>
     <string name="tour_switcher_title">버퍼 목록</string>
@@ -245,8 +245,8 @@
     <string name="tour_send_file_title">파일 보내기</string>
     <string name="tour_send_file_body">대상 닉을 입력한 다음 저장소에서 파일을 선택하세요. 들어오는 DCC 제안도 여기에 도착하며, 알림에서 수락하거나 거부할 수 있습니다.</string>
     <string name="tour_support_title">도움이 필요하신가요?</string>
-    <string name="tour_support_body">AfterNET에 연결하고 #HexDroid에 참여하여 지원을 받거나 기능 요청을 하거나 다른 HexDroid 사용자들과 대화하세요.</string>
-    <string name="tour_support_fallback">AfterNET이 아직 목록에 없습니다: AfterNET 추가를 탭하여 추가한 다음 연결하고 지원을 위해 #HexDroid에 참여하세요.</string>
+    <string name="tour_support_body">AfterNET에 연결하고 #Geveze에 참여하여 지원을 받거나 기능 요청을 하거나 다른 Geveze 사용자들과 대화하세요.</string>
+    <string name="tour_support_fallback">AfterNET이 아직 목록에 없습니다: AfterNET 추가를 탭하여 추가한 다음 연결하고 지원을 위해 #Geveze에 참여하세요.</string>
     <string name="tour_support_action">AfterNET 추가</string>
     <string name="tour_replay_title">이 투어 다시 보기</string>
     <string name="tour_replay_body">설정 → 정보에서 언제든지 워크스루를 다시 실행할 수 있습니다. 완료를 탭하여 종료하세요.</string>
@@ -356,7 +356,7 @@
     <string name="setting_receive_typing">다른 사람의 입력 중 표시 보기</string>
     <string name="setting_receive_typing_desc">채널이나 DM에서 다른 사람이 메시지를 작성 중일 때 표시기를 표시합니다.</string>
     <string name="setting_read_receipts">읽음 확인</string>
-    <string name="setting_read_receipts_desc">개인 메시지에서 상대방의 메시지를 읽었음을 알리고, 상대방이 내 메시지를 읽었는지 표시합니다. 다른 HexDroid 사용자와만 작동합니다.</string>
+    <string name="setting_read_receipts_desc">개인 메시지에서 상대방의 메시지를 읽었음을 알리고, 상대방이 내 메시지를 읽었는지 표시합니다. 다른 Geveze 사용자와만 작동합니다.</string>
 
     <!-- draft/channel-rename -->
     <string name="channel_renamed">채널이 %1$s에서 %2$s로 이름 변경됨</string>
@@ -471,7 +471,7 @@
     <string name="menu_disconnect">연결 끊기</string>
     <string name="menu_exit">종료</string>
     <string name="menu_float">플로팅 창</string>
-    <string name="float_needs_permission">플로팅 창을 사용하려면 HexDroid가 다른 앱 위에 표시되도록 허용하세요</string>
+    <string name="float_needs_permission">플로팅 창을 사용하려면 Geveze가 다른 앱 위에 표시되도록 허용하세요</string>
 
     <!-- ChatScreen tail -->
     <string name="chat_cd_launch_scripts">스크립트 실행</string>
@@ -590,15 +590,15 @@
     <string name="network_cert_selected">선택됨: %1$s</string>
     <string name="network_cert_none">인증서가 선택되지 않았습니다.</string>
     <string name="netcert_title">이 네트워크용 인증서</string>
-    <string name="netcert_desc">HexDroid는 이 네트워크만을 위해 만든 인증서를 제시하므로 SASL EXTERNAL로 로그인할 수 있습니다.</string>
+    <string name="netcert_desc">Geveze는 이 네트워크만을 위해 만든 인증서를 제시하므로 SASL EXTERNAL로 로그인할 수 있습니다.</string>
     <string name="netcert_pending">처음 연결할 때 만들어집니다</string>
     <string name="netcert_fingerprint">지문: %1$s</string>
     <string name="netcert_add_nickserv">%1$s 계정에 추가</string>
     <string name="netcert_add_sent">%1$s에 인증서를 보냈습니다. 서버 버퍼에서 응답을 확인한 다음 SASL을 EXTERNAL로 바꾸세요.</string>
     <string name="netcert_not_connected">먼저 이 네트워크에 연결하고 서비스에 인증하세요</string>
     <string name="core_netcert_unavailable">*** 이 네트워크의 인증서를 만들 수 없어 인증서 없이 연결했습니다.</string>
-    <string name="core_netcert_created">*** 이제 HexDroid는 이 네트워크만을 위해 만든 인증서를 제시하므로 SASL EXTERNAL로 로그인할 수 있습니다. 네트워크의 TLS 인증서 설정에서 끌 수 있습니다.</string>
-    <string name="vm_auth_sasl_netcert">HexDroid를 다시 설치했거나 복원했다면 이 네트워크의 인증서가 새로 바뀌었습니다. 비밀번호로 인증한 다음 네트워크 인증서 설정에서 계정에 다시 추가하세요.</string>
+    <string name="core_netcert_created">*** 이제 Geveze는 이 네트워크만을 위해 만든 인증서를 제시하므로 SASL EXTERNAL로 로그인할 수 있습니다. 네트워크의 TLS 인증서 설정에서 끌 수 있습니다.</string>
+    <string name="vm_auth_sasl_netcert">Geveze를 다시 설치했거나 복원했다면 이 네트워크의 인증서가 새로 바뀌었습니다. 비밀번호로 인증한 다음 네트워크 인증서 설정에서 계정에 다시 추가하세요.</string>
     <string name="network_cert_pem_hint">.pem에는 인증서와 개인 키가 모두 포함되어야 합니다.</string>
     <string name="network_cert_choose_pem">.pem / .crt / .cer 선택</string>
     <string name="network_cert_replace_pem">.pem / .crt / .cer 교체</string>
@@ -770,7 +770,7 @@
     <string name="about_doc_getting_started">시작하기</string>
     <string name="about_doc_getting_started_desc">세 단계로 연결한 뒤 계정과 바운서를 설정하세요.</string>
     <string name="about_doc_features">기능</string>
-    <string name="about_doc_features_desc">HexDroid가 하는 일과 사용해 본 느낌.</string>
+    <string name="about_doc_features_desc">Geveze가 하는 일과 사용해 본 느낌.</string>
     <string name="about_doc_reference">레퍼런스</string>
     <string name="about_doc_reference_desc">모든 IRCv3 기능과 모든 설정을 빠짐없이.</string>
     <string name="about_doc_commands">명령어</string>
@@ -884,7 +884,7 @@
     <string name="enc_safety_number">보안 번호</string>
     <string name="enc_verify_match">상대방에게 보이는 값과 일치하는지 확인하세요.</string>
     <string name="enc_cipher">암호 방식</string>
-    <string name="enc_agm_desc">HexDroid의 Authenticated Group Messaging.  256비트 난수 키 하나로 메시지마다 인증 암호화를 수행합니다. 키는 직접 공유합니다.</string>
+    <string name="enc_agm_desc">Geveze의 Authenticated Group Messaging.  256비트 난수 키 하나로 메시지마다 인증 암호화를 수행합니다. 키는 직접 공유합니다.</string>
     <string name="enc_age_desc">Authenticated Group Exchange.  키가 자동으로 협상되고 앞으로 교체됩니다. 개인 메시지에 순방향 비밀성을 제공합니다.</string>
     <string name="enc_fish_desc">상대가 +AGM이나 +AGE를 지원하지 않을 때만 FiSH를 사용하세요.</string>
     <string name="enc_regen">다시 생성</string>
@@ -1071,8 +1071,6 @@
     <string name="vm_sts_upgrade">STS: 서버가 TLS를 요구합니다 - %1$s 포트로 보안 재연결합니다</string>
     <string name="vm_registered_as">%1$s(으)로 등록되었습니다</string>
     <string name="vm_reconnected">재연결되었습니다</string>
-    <string name="vm_replay_summary">%2$s에서 %1$s를 다시 불러왔습니다.</string>
-    <string name="vm_replay_previous_disconnect">이전 연결 끊김: %1$s</string>
     <string name="vm_waiting_autojoin">자동 참여 &amp; 명령 실행 전 %1$s초 대기 중…</string>
     <string name="vm_waiting">%1$s초 대기 중…</string>
     <string name="vm_dcc_incoming">%1$s이(가) 보낸 DCC 파일 제안: %2$s (수락하려면 파일 전송 화면으로)</string>
@@ -1103,7 +1101,7 @@
     <string name="vm_names_none">%1$s의 NAMES: (없음)</string>
     <string name="vm_names_header">%1$s의 NAMES (%2$s):</string>
     <string name="vm_log_write_failed">%1$s의 로그 기록에 실패했습니다: %2$s</string>
-    <string name="vm_dcc_lan_perm">%1$s의 DCC: 로컬 네트워크 권한이 필요합니다 (Android 17 이상). 설정 → 앱 → HexDroid → 권한에서 허용하세요.</string>
+    <string name="vm_dcc_lan_perm">%1$s의 DCC: 로컬 네트워크 권한이 필요합니다 (Android 17 이상). 설정 → 앱 → Geveze → 권한에서 허용하세요.</string>
     <string name="vm_dcc_accepted_passive">수동 DCC 제안을 수락했습니다: %1$s (%2$s에서 대기 중)%3$s</string>
     <string name="vm_dcc_resume_requested">%1$s의 DCC RESUME을 %2$s바이트 지점부터 요청했습니다…</string>
     <string name="vm_dcc_resume_agreed">보낸 쪽이 %1$s바이트 지점의 RESUME을 수락했습니다 (요청은 %2$s)</string>
@@ -1120,7 +1118,7 @@
     <string name="vm_dcc_chat_connected">DCC CHAT이 %1$s에 연결되었습니다</string>
     <string name="vm_dcc_chat_not_connected">DCC CHAT이 연결되어 있지 않습니다.</string>
     <string name="vm_dcc_chat_send_failed">DCC CHAT 전송에 실패했습니다: %1$s</string>
-    <string name="vm_dcc_chat_lan_perm">%1$s의 DCC CHAT: 로컬 네트워크 권한이 필요합니다 (Android 17 이상). 설정 → 앱 → HexDroid → 권한에서 허용하세요.</string>
+    <string name="vm_dcc_chat_lan_perm">%1$s의 DCC CHAT: 로컬 네트워크 권한이 필요합니다 (Android 17 이상). 설정 → 앱 → Geveze → 권한에서 허용하세요.</string>
     <string name="vm_dcc_chat_connecting">DCC CHAT을 %1$s에 연결하는 중 (%2$s:%3$s)…</string>
     <string name="vm_dcc_chat_connect_failed">DCC CHAT 연결에 실패했습니다: %1$s</string>
     <string name="vm_dcc_chat_rejected">%1$s의 DCC CHAT 제안을 거부했습니다</string>
@@ -1178,7 +1176,7 @@
     <string name="ok">확인</string>
     <string name="remove">제거</string>
     <string name="add">추가</string>
-    <string name="about_logo_desc">HexDroid 로고</string>
+    <string name="about_logo_desc">Geveze 로고</string>
     <string name="about_boxlabs_desc">boxlabs</string>
     <string name="netedit_port_range">포트는 1에서 65535 사이여야 합니다</string>
     <string name="netedit_sasl_external">EXTERNAL (클라이언트 인증서)</string>
@@ -1198,7 +1196,7 @@
     <string name="core_disconnect_server_error">서버 오류: %1$s</string>
     <string name="core_disconnect_tls_fingerprint_changed">TLS 인증서 지문이 변경되었습니다</string>
     <string name="core_disconnect_tls_hostname_mismatch">TLS 인증서가 이 호스트에 유효하지 않습니다</string>
-    <string name="vm_cert_hostname_grace">인증서 호스트 이름 불일치: %1$s에 연결했지만 인증서는 %2$s에 발급되었습니다. HexDroid는 이전에 이를 확인하지 않았으므로, 이 프로필이 계속 작동하도록 이 이름들을 한 번 허용했고 연결을 다시 시도하고 있습니다. 예상하지 못한 일이라면 네트워크 설정을 열고 \'이 이름 신뢰 중지\'를 누르세요.</string>
+    <string name="vm_cert_hostname_grace">인증서 호스트 이름 불일치: %1$s에 연결했지만 인증서는 %2$s에 발급되었습니다. Geveze는 이전에 이를 확인하지 않았으므로, 이 프로필이 계속 작동하도록 이 이름들을 한 번 허용했고 연결을 다시 시도하고 있습니다. 예상하지 못한 일이라면 네트워크 설정을 열고 \'이 이름 신뢰 중지\'를 누르세요.</string>
     <string name="core_disconnect_connect_failed">연결에 실패했습니다: %1$s</string>
     <string name="core_disconnect_connection_error">연결 오류: %1$s</string>
     <string name="core_disconnect_registration_timeout">등록 시간 초과</string>
@@ -1285,7 +1283,7 @@
     <string name="core_reg_hint_invalid_code">(인증 메시지에 있는 코드를 다시 확인하세요)</string>
     <string name="core_reg_hint_not_connected">(완전히 연결될 때까지 기다렸다가 다시 시도하세요)</string>
     <string name="core_reg_hint_temp_unavailable">(나중에 다시 시도하세요)</string>
-    <string name="core_age_plaintext_refused">%1$s에 +AGE가 켜져 있지만 이 메시지는 암호화되지 않아 전송하지 않았습니다 (HexDroid는 평문으로 내보내지 않습니다). 평소처럼 대화하려면 여기서 +AGE를 끄세요.</string>
+    <string name="core_age_plaintext_refused">%1$s에 +AGE가 켜져 있지만 이 메시지는 암호화되지 않아 전송하지 않았습니다 (Geveze는 평문으로 내보내지 않습니다). 평소처럼 대화하려면 여기서 +AGE를 끄세요.</string>
     <string name="core_nick_still_in_use">%1$s은(는) 아직 사용 중입니다. 백그라운드에서 조용히 다시 시도합니다 (남아 있는 세션은 보통 몇 분 안에 정리됩니다).</string>
     <string name="core_nick_gave_up">%1$s 되찾기를 중단했습니다. 아직 사용 중입니다. 다시 시도하려면 /nick %1$s 명령을 쓰세요.</string>
     <string name="core_oversize_line_dropped">너무 큰 수신 IRC 줄을 버렸습니다 (32KiB 초과). 연결은 유지되며, 이후 폐기는 알리지 않습니다.</string>
@@ -1808,8 +1806,8 @@
     <string name="notif_reply_hint">답장…</string>
     <string name="notif_quit">연결 끊기</string>
     <string name="notif_reply_not_sent_title">답장을 보내지 못함: 연결되지 않음</string>
-    <string name="notif_reply_not_sent_text">HexDroid를 열고 다시 연결하면 %1$s에게 답장을 보낼 수 있습니다</string>
-    <string name="notif_channel_connection_desc">HexDroid IRC가 연결된 동안의 연결 상태</string>
+    <string name="notif_reply_not_sent_text">Geveze를 열고 다시 연결하면 %1$s에게 답장을 보낼 수 있습니다</string>
+    <string name="notif_channel_connection_desc">Geveze IRC가 연결된 동안의 연결 상태</string>
     <string name="notif_channel_errors">IRC 오류</string>
     <string name="notif_channel_errors_desc">서버 및 연결 오류 (네트워크별로 켠 경우에만)</string>
     <string name="notif_channel_group_networks">IRC 네트워크</string>

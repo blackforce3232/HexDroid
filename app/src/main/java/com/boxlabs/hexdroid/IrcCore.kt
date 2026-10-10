@@ -1286,7 +1286,7 @@ private const val SILENT_MODE_QUERY_TTL_MS = 15_000L
 private const val WHO_REQUEST_TTL_MS = 60_000L
 
 /** Vendor client-only tag for read receipts in private messages. Value: the msgid read up to. */
-internal const val READ_RECEIPT_TAG = "hexdroid.org/read"
+internal const val READ_RECEIPT_TAG = "geveze.org/read"
 
 /** Split [text] into pieces of at most [maxBytes] UTF-8 bytes, never mid-codepoint. */
 internal fun splitByUtf8Bytes(text: String, maxBytes: Int): List<String> {
@@ -2804,7 +2804,7 @@ class IrcClient(val config: IrcConfig) {
 										// Build the reply at call time so it always reflects the
 										// installed app version - never stale from a saved config.
 										ctcpLastReplyMs[senderKey] = now
-										val reply = "VERSION HexDroid v${BuildConfig.VERSION_NAME} - https://hexdroid.org"
+										val reply = "VERSION Geveze v${BuildConfig.VERSION_NAME}"
 										sendCtcpReply(safeSender, reply)
 										send(IrcEvent.CtcpExchange(fromNick = safeSender, request = ctcpContent, reply = reply))
 										return
@@ -2844,7 +2844,7 @@ class IrcClient(val config: IrcConfig) {
 									}
 									"SOURCE" -> {
 										ctcpLastReplyMs[senderKey] = now
-										val reply = "SOURCE https://hexdroid.org"
+										val reply = "SOURCE Geveze"
 										sendCtcpReply(safeSender, reply)
 										send(IrcEvent.CtcpExchange(fromNick = safeSender, request = ctcpContent, reply = reply))
 										return

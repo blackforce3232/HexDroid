@@ -1,5 +1,5 @@
 /*
-* HexDroidIRC - An IRC Client for Android
+* GevezeUserIRC - An IRC Client for Android
 * Copyright (C) 2026 boxlabs
 *
 * This program is free software: you can redistribute it and/or modify
@@ -123,12 +123,12 @@ private val CARD_BG = Color(0xFF171B21)
 private val CONTENT_MAX_WIDTH = 420.dp
 
 /*
- * Fixed links shared with hexdroid.org
+ * Fixed links shared with geveze.org
  *
  */
-private const val SUPPORT_IRC_URL = "ircs://irc.afternet.org:6697/HexDroid"
-private const val SUPPORT_CHANNEL_LABEL = "#HexDroid on irc.afternet.org"
-private const val WEBSITE_LABEL = "hexdroid.org"
+private const val SUPPORT_IRC_URL = "ircs://irc.afternet.org:6697/Geveze"
+private const val SUPPORT_CHANNEL_LABEL = " #Geveze on irc.afternet.org"
+private const val WEBSITE_LABEL = "geveze.org"
 
 /*
  *  CONTRIBUTORS
@@ -161,8 +161,8 @@ private val CREDITS: List<CreditGroup> = listOf(
 @Composable
 fun AboutScreen(onBack: () -> Unit) {
     val ctx = LocalContext.current
-    val website = "https://hexdroid.org"
-    val sourceUrl = "https://github.com/boxlabss/HexDroid"
+    val website = "https://geveze.org"
+    val sourceUrl = "https://github.com/boxlabss/GevezeUser"
     val scroll = rememberScrollState()
 
     Scaffold(

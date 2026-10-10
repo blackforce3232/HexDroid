@@ -131,11 +131,11 @@ fun buildIntroTour(context: Context? = null): List<IntroTourStep> {
             fallbackTarget = TourTarget.NETWORKS_ADD_FAB,
             title  = s(R.string.tour_support_title, "Need help?"),
             body   = s(R.string.tour_support_body,
-                "Connect to AfterNET and join #HexDroid for support, feature requests, " +
+                "Connect to AfterNET and join  #Geveze for support, feature requests, " +
                 "or just to chat with other HexDroid users."),
             fallbackBody = s(R.string.tour_support_fallback,
                 "AfterNET isn't in your list yet — tap Add AfterNET to add it, " +
-                "then connect and join #HexDroid for support."),
+                "then connect and join  #Geveze for support."),
             action = IntroTourAction(
                 IntroTourActionId.ADD_AFTERNET,
                 s(R.string.tour_support_action, "Add AfterNET"),

@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">HexDroid IRC</string>
+    <string name="app_name">Geveze IRC</string>
 
     <!-- Welcome / Setup Screen -->
-    <string name="welcome_title">HexDroid\'e Hoş Geldiniz</string>
+    <string name="welcome_title">Geveze\'e Hoş Geldiniz</string>
     <string name="welcome_subtitle">Başlamadan önce sizi ayarlayalım.</string>
     <string name="welcome_language_label">Dil</string>
     <string name="welcome_nick_label">Takma ad</string>
@@ -229,7 +229,7 @@
 
     <!-- Tour steps -->
     <string name="tour_add_network_title">Ağlarınız</string>
-    <string name="tour_add_network_body">Bir sunucu eklemek için + simgesine dokunun veya mevcut olanları düzenleyin. HexDroid birkaç varsayılanla birlikte gelir.</string>
+    <string name="tour_add_network_body">Bir sunucu eklemek için + simgesine dokunun veya mevcut olanları düzenleyin. Geveze birkaç varsayılanla birlikte gelir.</string>
     <string name="tour_connect_title">Bağlan</string>
     <string name="tour_connect_body">Bağlantı açmak için Bağlan\'a dokunun. Aynı anda birden fazla ağa bağlanabilirsiniz.</string>
     <string name="tour_switcher_title">Tampon listesi</string>
@@ -245,8 +245,8 @@
     <string name="tour_send_file_title">Dosya gönder</string>
     <string name="tour_send_file_body">Hedef nick\'i girin, ardından depolamadan bir dosya seçin. Gelen DCC teklifleri de burada gelir, bildirimlerden kabul edin veya reddedin.</string>
     <string name="tour_support_title">Yardım mı lazım?</string>
-    <string name="tour_support_body">AfterNET\'e bağlanın ve destek, özellik istekleri için veya diğer HexDroid kullanıcılarıyla sohbet etmek için #HexDroid kanalına katılın.</string>
-    <string name="tour_support_fallback">AfterNET henüz listenizde değil: AfterNET Ekle\'ye dokunun, ardından bağlanıp destek için #HexDroid kanalına katılın.</string>
+    <string name="tour_support_body">AfterNET\'e bağlanın ve destek, özellik istekleri için veya diğer Geveze kullanıcılarıyla sohbet etmek için #Geveze kanalına katılın.</string>
+    <string name="tour_support_fallback">AfterNET henüz listenizde değil: AfterNET Ekle\'ye dokunun, ardından bağlanıp destek için #Geveze kanalına katılın.</string>
     <string name="tour_support_action">AfterNET Ekle</string>
     <string name="tour_replay_title">Bu turu tekrar oynat</string>
     <string name="tour_replay_body">Tanıtımı istediğiniz zaman Ayarlar → Hakkında üzerinden tekrar başlatabilirsiniz. Bitirmek için Bitti\'ye dokunun.</string>
@@ -356,7 +356,7 @@
     <string name="setting_receive_typing">Diğerlerinin yazma göstergelerini göster</string>
     <string name="setting_receive_typing_desc">Bir kanal veya özel mesajda başkası mesaj yazarken gösterge göster.</string>
     <string name="setting_read_receipts">Okundu bilgisi</string>
-    <string name="setting_read_receipts_desc">Özel mesajlarda, karşı tarafa mesajlarını okuduğunuzu bildirir ve sizinkileri ne zaman okuduklarını gösterir. Yalnızca diğer HexDroid kullanıcılarıyla çalışır.</string>
+    <string name="setting_read_receipts_desc">Özel mesajlarda, karşı tarafa mesajlarını okuduğunuzu bildirir ve sizinkileri ne zaman okuduklarını gösterir. Yalnızca diğer Geveze kullanıcılarıyla çalışır.</string>
 
     <!-- draft/channel-rename -->
     <string name="channel_renamed">Kanal %1$s\'dan %2$s\'ye yeniden adlandırıldı</string>
@@ -471,7 +471,7 @@
     <string name="menu_disconnect">Bağlantıyı kes</string>
     <string name="menu_exit">Çıkış</string>
     <string name="menu_float">Yüzen pencere</string>
-    <string name="float_needs_permission">Yüzen pencereyi kullanmak için HexDroid\'in diğer uygulamaların üzerinde görüntülenmesine izin verin</string>
+    <string name="float_needs_permission">Yüzen pencereyi kullanmak için Geveze\'in diğer uygulamaların üzerinde görüntülenmesine izin verin</string>
 
     <!-- ChatScreen tail -->
     <string name="chat_cd_launch_scripts">Betikleri çalıştır</string>
@@ -590,15 +590,15 @@
     <string name="network_cert_selected">Seçildi: %1$s</string>
     <string name="network_cert_none">Sertifika seçilmedi.</string>
     <string name="netcert_title">Bu ağ için sertifika</string>
-    <string name="netcert_desc">HexDroid yalnızca bu ağ için oluşturulmuş bir sertifika sunar; böylece SASL EXTERNAL ile giriş yapabilirsiniz.</string>
+    <string name="netcert_desc">Geveze yalnızca bu ağ için oluşturulmuş bir sertifika sunar; böylece SASL EXTERNAL ile giriş yapabilirsiniz.</string>
     <string name="netcert_pending">İlk bağlantıda oluşturulur</string>
     <string name="netcert_fingerprint">Parmak izi: %1$s</string>
     <string name="netcert_add_nickserv">%1$s hesabına ekle</string>
     <string name="netcert_add_sent">Sertifika %1$s\'e gönderildi. Yanıtı sunucu arabelleğinde kontrol edin, ardından SASL\'ı EXTERNAL olarak değiştirin.</string>
     <string name="netcert_not_connected">Önce bu ağa bağlanın ve ağın hizmetlerinde kimliğinizi doğrulayın</string>
     <string name="core_netcert_unavailable">*** Bu ağın sertifikası oluşturulamadı, bu yüzden sertifikasız bağlandınız.</string>
-    <string name="core_netcert_created">*** HexDroid artık yalnızca bu ağ için oluşturulmuş bir sertifika sunuyor; böylece SASL EXTERNAL ile giriş yapabilirsiniz. Bunu ağın TLS sertifikası ayarlarından kapatabilirsiniz.</string>
-    <string name="vm_auth_sasl_netcert">HexDroid yeniden yüklendiyse veya geri yüklendiyse bu ağın sertifikası yenidir: parolanızla kimliğinizi doğrulayın, ardından ağın sertifika ayarlarından hesabınıza yeniden ekleyin.</string>
+    <string name="core_netcert_created">*** Geveze artık yalnızca bu ağ için oluşturulmuş bir sertifika sunuyor; böylece SASL EXTERNAL ile giriş yapabilirsiniz. Bunu ağın TLS sertifikası ayarlarından kapatabilirsiniz.</string>
+    <string name="vm_auth_sasl_netcert">Geveze yeniden yüklendiyse veya geri yüklendiyse bu ağın sertifikası yenidir: parolanızla kimliğinizi doğrulayın, ardından ağın sertifika ayarlarından hesabınıza yeniden ekleyin.</string>
     <string name="network_cert_pem_hint">.pem hem sertifikanızı hem de özel anahtarınızı içermelidir.</string>
     <string name="network_cert_choose_pem">.pem / .crt / .cer seç</string>
     <string name="network_cert_replace_pem">.pem / .crt / .cer değiştir</string>
@@ -770,7 +770,7 @@
     <string name="about_doc_getting_started">Başlarken</string>
     <string name="about_doc_getting_started_desc">Üç adımda bağlanın, ardından hesapları ve bouncer\'ları ayarlayın.</string>
     <string name="about_doc_features">Özellikler</string>
-    <string name="about_doc_features_desc">HexDroid ne yapar ve kullanımı nasıldır.</string>
+    <string name="about_doc_features_desc">Geveze ne yapar ve kullanımı nasıldır.</string>
     <string name="about_doc_reference">Başvuru</string>
     <string name="about_doc_reference_desc">Tüm IRCv3 yetenekleri ve tüm ayarlar, eksiksiz.</string>
     <string name="about_doc_commands">Komutlar</string>
@@ -884,7 +884,7 @@
     <string name="enc_safety_number">Güvenlik numarası</string>
     <string name="enc_verify_match">Bunun karşı tarafın gördüğüyle eşleştiğini doğrulayın.</string>
     <string name="enc_cipher">Şifre algoritması</string>
-    <string name="enc_agm_desc">HexDroid Authenticated Group Messaging.  Tek bir 256 bitlik rastgele anahtar, mesaj başına kimliği doğrulanmış şifreleme. Anahtarı siz paylaşırsınız.</string>
+    <string name="enc_agm_desc">Geveze Authenticated Group Messaging.  Tek bir 256 bitlik rastgele anahtar, mesaj başına kimliği doğrulanmış şifreleme. Anahtarı siz paylaşırsınız.</string>
     <string name="enc_age_desc">Authenticated Group Exchange.  Anahtarlar otomatik olarak anlaşılır ve ileriye doğru döner. Özel mesajlar için ileri gizlilik.</string>
     <string name="enc_fish_desc">FiSH kullanımını yalnızca karşı taraf +AGM veya +AGE desteklemiyorsa tercih edin.</string>
     <string name="enc_regen">Yeniden üret</string>
@@ -1071,8 +1071,6 @@
     <string name="vm_sts_upgrade">STS: sunucu TLS gerektiriyor - %1$s numaralı bağlantı noktasından güvenli yeniden bağlanılıyor</string>
     <string name="vm_registered_as">Kaydedildi: %1$s</string>
     <string name="vm_reconnected">Yeniden bağlanıldı</string>
-    <string name="vm_replay_summary">%2$s %1$s yeniden oynatıldı.</string>
-    <string name="vm_replay_previous_disconnect">Önceki bağlantı kesilmesi: %1$s</string>
     <string name="vm_waiting_autojoin">Otomatik katılım &amp; komutlardan önce %1$s saniye bekleniyor…</string>
     <string name="vm_waiting">%1$s saniye bekleniyor…</string>
     <string name="vm_dcc_incoming">%1$s kaynaklı gelen DCC dosya teklifi: %2$s (kabul etmek için Aktarımlar ekranı)</string>
@@ -1103,7 +1101,7 @@
     <string name="vm_names_none">%1$s için NAMES: (yok)</string>
     <string name="vm_names_header">%1$s için NAMES (%2$s):</string>
     <string name="vm_log_write_failed">%1$s için günlük yazma başarısız: %2$s</string>
-    <string name="vm_dcc_lan_perm">%1$s kaynaklı DCC: yerel ağ izni gerekiyor (Android 17+). Ayarlar → Uygulamalar → HexDroid → İzinler yolundan verin.</string>
+    <string name="vm_dcc_lan_perm">%1$s kaynaklı DCC: yerel ağ izni gerekiyor (Android 17+). Ayarlar → Uygulamalar → Geveze → İzinler yolundan verin.</string>
     <string name="vm_dcc_accepted_passive">Pasif DCC teklifi kabul edildi: %1$s (%2$s üzerinde dinleniyor)%3$s</string>
     <string name="vm_dcc_resume_requested">%1$s için %2$s bayttan DCC RESUME istendi…</string>
     <string name="vm_dcc_resume_agreed">Gönderen %1$s bayttan RESUME kabul etti (biz %2$s istemiştik)</string>
@@ -1120,7 +1118,7 @@
     <string name="vm_dcc_chat_connected">DCC CHAT bağlandı: %1$s</string>
     <string name="vm_dcc_chat_not_connected">DCC CHAT bağlı değil.</string>
     <string name="vm_dcc_chat_send_failed">DCC CHAT gönderimi başarısız: %1$s</string>
-    <string name="vm_dcc_chat_lan_perm">%1$s kaynaklı DCC CHAT: yerel ağ izni gerekiyor (Android 17+). Ayarlar → Uygulamalar → HexDroid → İzinler yolundan verin.</string>
+    <string name="vm_dcc_chat_lan_perm">%1$s kaynaklı DCC CHAT: yerel ağ izni gerekiyor (Android 17+). Ayarlar → Uygulamalar → Geveze → İzinler yolundan verin.</string>
     <string name="vm_dcc_chat_connecting">DCC CHAT bağlanıyor: %1$s (%2$s:%3$s)…</string>
     <string name="vm_dcc_chat_connect_failed">DCC CHAT bağlantısı başarısız: %1$s</string>
     <string name="vm_dcc_chat_rejected">%1$s kaynaklı DCC CHAT teklifi reddedildi</string>
@@ -1178,7 +1176,7 @@
     <string name="ok">Tamam</string>
     <string name="remove">Kaldır</string>
     <string name="add">Ekle</string>
-    <string name="about_logo_desc">HexDroid logosu</string>
+    <string name="about_logo_desc">Geveze logosu</string>
     <string name="about_boxlabs_desc">boxlabs</string>
     <string name="netedit_port_range">Bağlantı noktası 1 ile 65535 arasında olmalıdır</string>
     <string name="netedit_sasl_external">EXTERNAL (istemci sertifikası)</string>
@@ -1198,7 +1196,7 @@
     <string name="core_disconnect_server_error">Sunucu hatası: %1$s</string>
     <string name="core_disconnect_tls_fingerprint_changed">TLS sertifikası parmak izi değişti</string>
     <string name="core_disconnect_tls_hostname_mismatch">TLS sertifikası bu ana makine için geçerli değil</string>
-    <string name="vm_cert_hostname_grace">Sertifika ana makine adı uyuşmuyor: %1$s adresine bağlanıldı ancak sertifika şunun için verilmiş: %2$s. HexDroid bunu daha önce denetlemiyordu, bu yüzden bu profil çalışmaya devam etsin diye bu adlar bir kez kabul edildi ve bağlantı yeniden deneniyor. Bunu beklemiyorsanız ağ ayarlarını açıp \'Bu adlara güvenmeyi bırak\' düğmesine dokunun.</string>
+    <string name="vm_cert_hostname_grace">Sertifika ana makine adı uyuşmuyor: %1$s adresine bağlanıldı ancak sertifika şunun için verilmiş: %2$s. Geveze bunu daha önce denetlemiyordu, bu yüzden bu profil çalışmaya devam etsin diye bu adlar bir kez kabul edildi ve bağlantı yeniden deneniyor. Bunu beklemiyorsanız ağ ayarlarını açıp \'Bu adlara güvenmeyi bırak\' düğmesine dokunun.</string>
     <string name="core_disconnect_connect_failed">Bağlantı kurulamadı: %1$s</string>
     <string name="core_disconnect_connection_error">Bağlantı hatası: %1$s</string>
     <string name="core_disconnect_registration_timeout">Kayıt zaman aşımı</string>
@@ -1285,7 +1283,7 @@
     <string name="core_reg_hint_invalid_code">(doğrulama mesajındaki kodu yeniden denetleyin)</string>
     <string name="core_reg_hint_not_connected">(tam olarak bağlanmayı bekleyip yeniden deneyin)</string>
     <string name="core_reg_hint_temp_unavailable">(daha sonra yeniden deneyin)</string>
-    <string name="core_age_plaintext_refused">%1$s için +AGE açık ancak bu mesaj şifrelenmemişti, bu yüzden gönderilmedi (HexDroid onu ağa açık biçimde koymaz). Normal sohbet için +AGE özelliğini burada kapatın.</string>
+    <string name="core_age_plaintext_refused">%1$s için +AGE açık ancak bu mesaj şifrelenmemişti, bu yüzden gönderilmedi (Geveze onu ağa açık biçimde koymaz). Normal sohbet için +AGE özelliğini burada kapatın.</string>
     <string name="core_nick_still_in_use">%1$s hâlâ kullanımda; arka planda sessizce yeniden deneniyor (askıda kalan oturum genellikle birkaç dakika içinde temizlenir).</string>
     <string name="core_nick_gave_up">%1$s geri alınmaya çalışılmaktan vazgeçildi, hâlâ kullanımda. Yeniden denemek için /nick %1$s kullanın.</string>
     <string name="core_oversize_line_dropped">Aşırı büyük bir gelen IRC satırı atıldı (&gt;32 KiB). Bağlantı korundu; sonraki atmalar sessiz olacak.</string>
@@ -1808,8 +1806,8 @@
     <string name="notif_reply_hint">Yanıtla…</string>
     <string name="notif_quit">Bağlantıyı kes</string>
     <string name="notif_reply_not_sent_title">Yanıt gönderilmedi: bağlı değil</string>
-    <string name="notif_reply_not_sent_text">Yanıtınızı %1$s hedefine göndermek için HexDroid\'i açıp yeniden bağlanın</string>
-    <string name="notif_channel_connection_desc">HexDroid IRC bağlıyken bağlantı durumu</string>
+    <string name="notif_reply_not_sent_text">Yanıtınızı %1$s hedefine göndermek için Geveze\'i açıp yeniden bağlanın</string>
+    <string name="notif_channel_connection_desc">Geveze IRC bağlıyken bağlantı durumu</string>
     <string name="notif_channel_errors">IRC hataları</string>
     <string name="notif_channel_errors_desc">Sunucu ve bağlantı hataları (yalnızca ağ başına açıldığında)</string>
     <string name="notif_channel_group_networks">IRC ağları</string>

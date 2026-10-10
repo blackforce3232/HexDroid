@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">‏HexDroid IRC</string>
+    <string name="app_name">‏Geveze IRC</string>
 
     <!-- Welcome / Setup Screen -->
-    <string name="welcome_title">مرحبًا في HexDroid</string>
+    <string name="welcome_title">مرحبًا في Geveze</string>
     <string name="welcome_subtitle">دعنا نعدّك قبل البدء.</string>
     <string name="welcome_language_label">اللغة</string>
     <string name="welcome_nick_label">الاسم المستعار</string>
@@ -229,7 +229,7 @@
 
     <!-- Tour steps -->
     <string name="tour_add_network_title">شبكاتك</string>
-    <string name="tour_add_network_body">اضغط + لإضافة خادم، أو عدّل الموجود. يأتي HexDroid مع بعض الشبكات الافتراضية.</string>
+    <string name="tour_add_network_body">اضغط + لإضافة خادم، أو عدّل الموجود. يأتي Geveze مع بعض الشبكات الافتراضية.</string>
     <string name="tour_connect_title">اتصال</string>
     <string name="tour_connect_body">اضغط اتصال لفتح اتصال. يمكنك الاتصال بعدة شبكات في الوقت نفسه.</string>
     <string name="tour_switcher_title">قائمة المخازن</string>
@@ -245,8 +245,8 @@
     <string name="tour_send_file_title">إرسال ملف</string>
     <string name="tour_send_file_body">أدخل اللقب المستهدف، ثم اختر ملفاً من التخزين. تصل عروض DCC الواردة هنا أيضاً، اقبلها أو ارفضها من الإشعارات.</string>
     <string name="tour_support_title">تحتاج إلى مساعدة؟</string>
-    <string name="tour_support_body">اتصل بـ AfterNET وانضم إلى ‎#HexDroid للدعم أو طلبات الميزات أو مجرد الدردشة مع مستخدمي HexDroid الآخرين.</string>
-    <string name="tour_support_fallback">AfterNET ليست في قائمتك بعد: اضغط على إضافة AfterNET لإضافتها، ثم اتصل وانضم إلى ‎#HexDroid للدعم.</string>
+    <string name="tour_support_body">اتصل بـ AfterNET وانضم إلى ‎#Geveze للدعم أو طلبات الميزات أو مجرد الدردشة مع مستخدمي Geveze الآخرين.</string>
+    <string name="tour_support_fallback">AfterNET ليست في قائمتك بعد: اضغط على إضافة AfterNET لإضافتها، ثم اتصل وانضم إلى ‎#Geveze للدعم.</string>
     <string name="tour_support_action">إضافة AfterNET</string>
     <string name="tour_replay_title">إعادة تشغيل الجولة</string>
     <string name="tour_replay_body">يمكنك تشغيل الجولة التعريفية مجدداً في أي وقت من الإعدادات ← حول. اضغط تم للإنهاء.</string>
@@ -356,7 +356,7 @@
     <string name="setting_receive_typing">عرض مؤشرات كتابة الآخرين</string>
     <string name="setting_receive_typing_desc">عرض مؤشر عندما يكتب شخص آخر رسالة في قناة أو خاصة.</string>
     <string name="setting_read_receipts">إيصالات القراءة</string>
-    <string name="setting_read_receipts_desc">في الرسائل الخاصة، أعلِم الآخرين عندما تقرأ رسائلهم، وشاهد متى قرأوا رسائلك. يعمل فقط مع مستخدمي HexDroid الآخرين.</string>
+    <string name="setting_read_receipts_desc">في الرسائل الخاصة، أعلِم الآخرين عندما تقرأ رسائلهم، وشاهد متى قرأوا رسائلك. يعمل فقط مع مستخدمي Geveze الآخرين.</string>
 
     <!-- draft/channel-rename -->
     <string name="channel_renamed">تمت إعادة تسمية القناة من %1$s إلى %2$s</string>
@@ -471,7 +471,7 @@
     <string name="menu_disconnect">قطع الاتصال</string>
     <string name="menu_exit">خروج</string>
     <string name="menu_float">نافذة عائمة</string>
-    <string name="float_needs_permission">اسمح لـ HexDroid بالظهور فوق التطبيقات الأخرى لاستخدام النافذة العائمة</string>
+    <string name="float_needs_permission">اسمح لـ Geveze بالظهور فوق التطبيقات الأخرى لاستخدام النافذة العائمة</string>
 
     <!-- ChatScreen tail -->
     <string name="chat_cd_launch_scripts">تشغيل السكربتات</string>
@@ -590,15 +590,15 @@
     <string name="network_cert_selected">المحدد: %1$s</string>
     <string name="network_cert_none">لم يتم اختيار شهادة.</string>
     <string name="netcert_title">شهادة لهذه الشبكة</string>
-    <string name="netcert_desc">يقدّم HexDroid شهادة مخصّصة لهذه الشبكة فقط، لتتمكن من تسجيل الدخول عبر SASL EXTERNAL.</string>
+    <string name="netcert_desc">يقدّم Geveze شهادة مخصّصة لهذه الشبكة فقط، لتتمكن من تسجيل الدخول عبر SASL EXTERNAL.</string>
     <string name="netcert_pending">تُنشأ عند أول اتصال</string>
     <string name="netcert_fingerprint">البصمة: %1$s</string>
     <string name="netcert_add_nickserv">إضافة إلى حساب %1$s</string>
     <string name="netcert_add_sent">أُرسلت الشهادة إلى %1$s. راجع مخزن الخادم لرؤية الرد، ثم غيّر SASL إلى EXTERNAL.</string>
     <string name="netcert_not_connected">اتصل بهذه الشبكة وعرّف نفسك لدى خدماتها أولًا</string>
     <string name="core_netcert_unavailable">*** تعذّر إنشاء شهادة هذه الشبكة، لذا أنت متصل بدونها.</string>
-    <string name="core_netcert_created">*** يقدّم HexDroid الآن شهادة مخصّصة لهذه الشبكة فقط، لتتمكن من تسجيل الدخول عبر SASL EXTERNAL. يمكنك إيقاف ذلك من إعدادات شهادة TLS للشبكة.</string>
-    <string name="vm_auth_sasl_netcert">إن أُعيد تثبيت HexDroid أو استعادته، فشهادة هذه الشبكة جديدة: عرّف نفسك بكلمة المرور، ثم أضفها إلى حسابك مجددًا من إعدادات شهادة الشبكة.</string>
+    <string name="core_netcert_created">*** يقدّم Geveze الآن شهادة مخصّصة لهذه الشبكة فقط، لتتمكن من تسجيل الدخول عبر SASL EXTERNAL. يمكنك إيقاف ذلك من إعدادات شهادة TLS للشبكة.</string>
+    <string name="vm_auth_sasl_netcert">إن أُعيد تثبيت Geveze أو استعادته، فشهادة هذه الشبكة جديدة: عرّف نفسك بكلمة المرور، ثم أضفها إلى حسابك مجددًا من إعدادات شهادة الشبكة.</string>
     <string name="network_cert_pem_hint">يجب أن يتضمن ملف .pem كلاً من شهادتك والمفتاح الخاص.</string>
     <string name="network_cert_choose_pem">اختيار .pem / .crt / .cer</string>
     <string name="network_cert_replace_pem">استبدال .pem / .crt / .cer</string>
@@ -770,7 +770,7 @@
     <string name="about_doc_getting_started">البدء</string>
     <string name="about_doc_getting_started_desc">اتصل في ثلاث خطوات، ثم اضبط الحسابات وخوادم البونسر.</string>
     <string name="about_doc_features">الميزات</string>
-    <string name="about_doc_features_desc">ما يفعله HexDroid وكيف يبدو استخدامه.</string>
+    <string name="about_doc_features_desc">ما يفعله Geveze وكيف يبدو استخدامه.</string>
     <string name="about_doc_reference">المرجع</string>
     <string name="about_doc_reference_desc">كل قدرات IRCv3 وكل إعداد، بالكامل.</string>
     <string name="about_doc_commands">الأوامر</string>
@@ -884,7 +884,7 @@
     <string name="enc_safety_number">رقم الأمان</string>
     <string name="enc_verify_match">تحقّق من أنه يطابق ما يراه الطرف الآخر.</string>
     <string name="enc_cipher">الشيفرة</string>
-    <string name="enc_agm_desc">‏Authenticated Group Messaging من HexDroid.  مفتاح عشوائي واحد بطول 256 بت، وتشفير موثّق لكل رسالة. أنت من يشارك المفتاح.</string>
+    <string name="enc_agm_desc">‏Authenticated Group Messaging من Geveze.  مفتاح عشوائي واحد بطول 256 بت، وتشفير موثّق لكل رسالة. أنت من يشارك المفتاح.</string>
     <string name="enc_age_desc">‏Authenticated Group Exchange.  تُتفاوض المفاتيح تلقائياً وتتجدد إلى الأمام. سرية تامة للرسائل الخاصة.</string>
     <string name="enc_fish_desc">استخدم FiSH فقط عندما لا يدعم الطرف الآخر +AGM أو +AGE.</string>
     <string name="enc_regen">إعادة التوليد</string>
@@ -1071,8 +1071,6 @@
     <string name="vm_sts_upgrade">‏STS: يتطلب الخادم TLS - جارٍ إعادة الاتصال بأمان على المنفذ %1$s</string>
     <string name="vm_registered_as">مسجَّل باسم %1$s</string>
     <string name="vm_reconnected">أُعيد الاتصال</string>
-    <string name="vm_replay_summary">الرسائل المستعادة: %1$s من %2$s.</string>
-    <string name="vm_replay_previous_disconnect">سبب الانقطاع السابق: %1$s</string>
     <string name="vm_waiting_autojoin">انتظار %1$s ثانية قبل الانضمام التلقائي &amp; الأوامر…</string>
     <string name="vm_waiting">انتظار %1$s ثانية…</string>
     <string name="vm_dcc_incoming">عرض ملف DCC وارد من %1$s: %2$s (افتح شاشة عمليات النقل للقبول)</string>
@@ -1103,7 +1101,7 @@
     <string name="vm_names_none">‏NAMES لـ %1$s: (لا شيء)</string>
     <string name="vm_names_header">‏NAMES لـ %1$s (%2$s):</string>
     <string name="vm_log_write_failed">فشلت كتابة السجل لـ %1$s: %2$s</string>
-    <string name="vm_dcc_lan_perm">‏DCC من %1$s: يلزم إذن الشبكة المحلية (Android 17+). امنحه من الإعدادات ← التطبيقات ← HexDroid ← الأذونات.</string>
+    <string name="vm_dcc_lan_perm">‏DCC من %1$s: يلزم إذن الشبكة المحلية (Android 17+). امنحه من الإعدادات ← التطبيقات ← Geveze ← الأذونات.</string>
     <string name="vm_dcc_accepted_passive">قُبل عرض DCC السلبي: %1$s (الإنصات على %2$s)%3$s</string>
     <string name="vm_dcc_resume_requested">طُلب DCC RESUME لـ %1$s عند %2$s بايت…</string>
     <string name="vm_dcc_resume_agreed">قبل المرسل RESUME عند %1$s بايت (طلبنا %2$s)</string>
@@ -1120,7 +1118,7 @@
     <string name="vm_dcc_chat_connected">اتصل DCC CHAT بـ %1$s</string>
     <string name="vm_dcc_chat_not_connected">‏DCC CHAT غير متصل.</string>
     <string name="vm_dcc_chat_send_failed">فشل الإرسال في DCC CHAT: %1$s</string>
-    <string name="vm_dcc_chat_lan_perm">‏DCC CHAT من %1$s: يلزم إذن الشبكة المحلية (Android 17+). امنحه من الإعدادات ← التطبيقات ← HexDroid ← الأذونات.</string>
+    <string name="vm_dcc_chat_lan_perm">‏DCC CHAT من %1$s: يلزم إذن الشبكة المحلية (Android 17+). امنحه من الإعدادات ← التطبيقات ← Geveze ← الأذونات.</string>
     <string name="vm_dcc_chat_connecting">جارٍ توصيل DCC CHAT بـ %1$s (%2$s:%3$s)…</string>
     <string name="vm_dcc_chat_connect_failed">فشل اتصال DCC CHAT: %1$s</string>
     <string name="vm_dcc_chat_rejected">رُفض عرض DCC CHAT من %1$s</string>
@@ -1178,7 +1176,7 @@
     <string name="ok">موافق</string>
     <string name="remove">إزالة</string>
     <string name="add">إضافة</string>
-    <string name="about_logo_desc">شعار HexDroid</string>
+    <string name="about_logo_desc">شعار Geveze</string>
     <string name="about_boxlabs_desc">‏boxlabs</string>
     <string name="netedit_port_range">يجب أن يكون المنفذ بين 1 و 65535</string>
     <string name="netedit_sasl_external">‏EXTERNAL (شهادة العميل)</string>
@@ -1198,7 +1196,7 @@
     <string name="core_disconnect_server_error">خطأ الخادم: %1$s</string>
     <string name="core_disconnect_tls_fingerprint_changed">تغيّرت بصمة شهادة TLS</string>
     <string name="core_disconnect_tls_hostname_mismatch">شهادة TLS غير صالحة لهذا المضيف</string>
-    <string name="vm_cert_hostname_grace">عدم تطابق اسم المضيف في الشهادة: متصل بـ %1$s لكن الشهادة صادرة لـ: %2$s. لم يكن HexDroid يتحقق من ذلك سابقًا، لذا قُبلت هذه الأسماء مرة واحدة ليستمر هذا الملف الشخصي في العمل، وتجري إعادة محاولة الاتصال. إذا لم تكن تتوقع ذلك، فافتح إعدادات الشبكة واضغط «التوقف عن الوثوق بهذه الأسماء».</string>
+    <string name="vm_cert_hostname_grace">عدم تطابق اسم المضيف في الشهادة: متصل بـ %1$s لكن الشهادة صادرة لـ: %2$s. لم يكن Geveze يتحقق من ذلك سابقًا، لذا قُبلت هذه الأسماء مرة واحدة ليستمر هذا الملف الشخصي في العمل، وتجري إعادة محاولة الاتصال. إذا لم تكن تتوقع ذلك، فافتح إعدادات الشبكة واضغط «التوقف عن الوثوق بهذه الأسماء».</string>
     <string name="core_disconnect_connect_failed">فشل الاتصال: %1$s</string>
     <string name="core_disconnect_connection_error">خطأ في الاتصال: %1$s</string>
     <string name="core_disconnect_registration_timeout">انتهت مهلة التسجيل</string>
@@ -1285,7 +1283,7 @@
     <string name="core_reg_hint_invalid_code">(أعد التحقق من الرمز الوارد في رسالة التحقق)</string>
     <string name="core_reg_hint_not_connected">(انتظر حتى يكتمل الاتصال، ثم حاول مرة أخرى)</string>
     <string name="core_reg_hint_temp_unavailable">(حاول مرة أخرى لاحقاً)</string>
-    <string name="core_age_plaintext_refused">‏+AGE مفعّل لـ %1$s لكن هذه الرسالة لم تكن مشفّرة، لذا لم تُرسل (لن يضعها HexDroid على الشبكة كنص واضح). عطّل +AGE هنا للدردشة بشكل طبيعي.</string>
+    <string name="core_age_plaintext_refused">‏+AGE مفعّل لـ %1$s لكن هذه الرسالة لم تكن مشفّرة، لذا لم تُرسل (لن يضعها Geveze على الشبكة كنص واضح). عطّل +AGE هنا للدردشة بشكل طبيعي.</string>
     <string name="core_nick_still_in_use">‏%1$s ما زال مستخدماً؛ تُعاد المحاولة بهدوء في الخلفية (عادةً ما تنتهي الجلسة العالقة خلال بضع دقائق).</string>
     <string name="core_nick_gave_up">توقفت محاولات استعادة %1$s، وما زال مستخدماً. استخدم ‎/nick %1$s لإعادة المحاولة.</string>
     <string name="core_oversize_line_dropped">أُسقط سطر IRC وارد كبير جداً (&gt;32 كيبيبايت). تم إبقاء الاتصال؛ وستكون عمليات الإسقاط اللاحقة صامتة.</string>
@@ -1808,8 +1806,8 @@
     <string name="notif_reply_hint">رد…</string>
     <string name="notif_quit">قطع الاتصال</string>
     <string name="notif_reply_not_sent_title">لم يُرسل الرد: غير متصل</string>
-    <string name="notif_reply_not_sent_text">افتح HexDroid وأعد الاتصال لإرسال ردك إلى %1$s</string>
-    <string name="notif_channel_connection_desc">حالة الاتصال أثناء اتصال HexDroid IRC</string>
+    <string name="notif_reply_not_sent_text">افتح Geveze وأعد الاتصال لإرسال ردك إلى %1$s</string>
+    <string name="notif_channel_connection_desc">حالة الاتصال أثناء اتصال Geveze IRC</string>
     <string name="notif_channel_errors">أخطاء IRC</string>
     <string name="notif_channel_errors_desc">أخطاء الخادم والاتصال (فقط عند تفعيلها لكل شبكة)</string>
     <string name="notif_channel_group_networks">شبكات IRC</string>
