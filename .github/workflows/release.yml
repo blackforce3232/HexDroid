@@ -1,5 +1,8 @@
 name: Release APK
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches: [my-edits]
 jobs:
   build:
     runs-on: ubuntu-latest
