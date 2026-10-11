@@ -136,8 +136,9 @@ class RemoteNickStyles(private val context: Context) {
         private val nickStyleEntry = Regex("\\\"([^\\\"]{1,64})\\\"\\s*:\\s*(\\d+)")
         private val designEntry = Regex("(?m)^\\s*(\\d+)\\s*:\\s*\\{\\s*classes\\s*:\\s*\\[([^]]*)]")
         private val classEntry = Regex("['\\\"]([A-Za-z0-9_-]+)['\\\"]")
-        private val colorEntry = Regex("\\.(bfrenK[A-Za-z0-9_-]+)\\s*\\{([^}]*)}")
-        private val fontEntry = Regex("\\.(bfFnt\\d+)\\s*\\{([^}]*)}")
+        // The closing brace is literal in the JVM regex grammar and must be escaped.
+        private val colorEntry = Regex("\\.(bfrenK[A-Za-z0-9_-]+)\\s*\\{([^}]+)\\}")
+        private val fontEntry = Regex("\\.(bfFnt\\d+)\\s*\\{([^}]+)\\}")
 
         fun parseSpecialNicks(js: String): Map<String, SpecialNickRule> = nickEntry.findAll(js).associate { m ->
             val raw = m.groupValues[2].removePrefix("#").toLong(16)
@@ -195,8 +196,8 @@ class NickFontCache(private val context: Context) {
         val uri = URI(url); require(uri.scheme == "https" && uri.host == host && uri.userInfo == null)
         val req = Request.Builder().url(url).build()
         client.newCall(req).execute().use { r ->
-            if (!r.isSuccessful || r.body == null || r.body!!.contentLength() > max) return null
-            val bytes = r.body!!.bytes(); if (bytes.size > max) return null
+            if (!r.isSuccessful || r.body.contentLength() > max) return null
+            val bytes = r.body.bytes(); if (bytes.size > max) return null
             if (host == "fonts.googleapis.com") bytes.toString(Charsets.UTF_8) else String(bytes, Charsets.ISO_8859_1)
         }
     }.getOrNull()
