@@ -2832,14 +2832,6 @@ fun ChatScreen(
         }
     }
 
-    val topBarTitle = if (selBufName == "*server*") selNetName else "$selNetName:$selBufName"
-
-    // Show the channel's modes next to the name. Rendered
-    // as a subtitle under the title rather than appended to it.
-    val topBarSubtitle = if (isChannel && selBufName != "*server*") {
-        state.buffers[selected]?.modeDisplay?.takeIf { it.isNotBlank() }
-    } else null
-
     val topBar: @Composable () -> Unit = {
         val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
         val compact = state.settings.compactMode
@@ -2875,7 +2867,7 @@ fun ChatScreen(
                 .fillMaxWidth()
                 .background(topBarBrush)
         ) {
-            Column(Modifier.fillMaxWidth()) {
+        Column(Modifier.fillMaxWidth()) {
                 // Keep content below the system status bar without making the app bar itself overly tall.
                 Spacer(Modifier.height(topInset))
                 Row(
@@ -2904,26 +2896,10 @@ fun ChatScreen(
                         ) { Text("☰") }
                     }
 
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            text = topBarTitle,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            // Line height tightened to its own font size: the default leading
-                            // would push the two-line stack past the fixed bar height at
-                            // larger system font scales.
-                            style = titleStyle.copy(lineHeight = titleStyle.fontSize * 1.1f),
-                        )
-                        if (topBarSubtitle != null) {
-                            Text(
-                                text = "Modes: $topBarSubtitle",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.labelSmall.copy(lineHeight = 12.sp),
-                                color = LocalContentColor.current.copy(alpha = 0.7f),
-                            )
-                        }
-                    }
+                    // The channel title and mode line are intentionally omitted. The action
+                    // icons form the compact, centered top bar; channel context is available
+                    // from the switcher directly below it.
+                    Spacer(Modifier.weight(1f))
 
                     // Colour/formatting picker button. No background: the sweep gradient
                     // is painted onto the FormatColorText glyph itself (SrcAtop over an
@@ -3171,6 +3147,42 @@ fun ChatScreen(
                             entries.forEachIndexed { idx, e ->
                                 MenuRow(e.label, enabled = e.enabled, onClick = e.onClick)
                                 if (idx in dividerAfter) HorizontalDivider()
+                            }
+                        }
+                    }
+                }
+                if (state.settings.networkTabsAtBottom) {
+                    val topTabKeys = state.networks
+                        .sortedWith(compareBy({ !it.isFavourite }, { it.sortOrder }, { it.name }))
+                        .filter { it.showInSidebar || it.id == splitKey(selected).first }
+                        .flatMap { net ->
+                            val group = buffersByNet[net.id]
+                            listOf(group?.serverKey ?: "${net.id}::*server*") + (group?.others ?: emptyList())
+                        }
+                    if (topTabKeys.isNotEmpty()) {
+                        val selectedIndex = topTabKeys.indexOf(selected).coerceIn(0, topTabKeys.lastIndex)
+                        key(topTabKeys) {
+                            SecondaryScrollableTabRow(
+                                selectedTabIndex = selectedIndex,
+                                edgePadding = 4.dp,
+                                containerColor = Color.Transparent,
+                            ) {
+                                topTabKeys.forEachIndexed { index, tabKey ->
+                                    val (tabNet, tabName) = splitKey(tabKey)
+                                    Tab(
+                                        selected = index == selectedIndex,
+                                        onClick = { onSelectBuffer(tabKey) },
+                                        text = {
+                                            Text(
+                                                if (tabName == "*server*")
+                                                    state.networks.firstOrNull { it.id == tabNet }?.name ?: tabNet
+                                                else tabName,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                            )
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
@@ -4589,8 +4601,8 @@ fun ChatScreen(
 
             val minBufferDp = 130.dp
             val maxBufferDp = 320.dp
-            val minNickDp = 110.dp
-            val maxNickDp = 280.dp
+            val minNickDp = 130.dp
+            val maxNickDp = 340.dp
 
             val minBufferFrac = (minBufferDp.value / screenWdp).coerceIn(0.10f, 0.60f)
             val maxBufferFrac = (maxBufferDp.value / screenWdp).coerceIn(0.10f, 0.60f)

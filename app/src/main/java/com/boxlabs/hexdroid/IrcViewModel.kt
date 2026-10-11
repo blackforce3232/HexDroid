@@ -247,10 +247,10 @@ data class UiSettings(
     // horizontal tab strip (one tab per network, showing that network's buffers below).
     // Which networks appear is controlled per-network by NetworkProfile.showInSidebar,
     // not a global setting.
-    val networkTabs: Boolean = false,
+    val networkTabs: Boolean = true,
     // Pin a network quick-switcher bar at the bottom of the chat, just above the message input,
     // independent of the drawer's tree/tabs mode. Tapping a network jumps to it.
-    val networkTabsAtBottom: Boolean = false,
+    val networkTabsAtBottom: Boolean = true,
     val showTimestamps: Boolean = true,
     val timestampFormat: String = "HH:mm:ss",
     /** Brackets drawn around the timestamp. */
@@ -267,7 +267,7 @@ data class UiSettings(
 
     val chatFontStyle: ChatFontStyle = ChatFontStyle.REGULAR,
     /** Independent scale for channel and private-message text. */
-    val chatMessageScale: Float = 0.60f,
+    val chatMessageScale: Float = 0.85f,
 
     /**
      * Space BETWEEN messages, as a fraction of the chat font size.
@@ -290,7 +290,8 @@ data class UiSettings(
     val nicklistFontOffset: Int = 0,
     val showTopicBar: Boolean = true,
     val hideMotdOnConnect: Boolean = false,
-    val hideJoinPartQuit: Boolean = false,
+    /** Hide JOIN/PART/QUIT event lines by default; topic/server information remains visible. */
+    val hideJoinPartQuit: Boolean = true,
     /** Join, part and quit lines leave out the user@host. */
     val hideHostnames: Boolean = false,
     /** Colour channel-event lines (join, part, quit, kick, nick, mode). Display only. */
@@ -348,8 +349,8 @@ data class UiSettings(
     val vibrateOnHighlight: Boolean = false,
     val vibrateIntensity: VibrateIntensity = VibrateIntensity.MEDIUM,
 
-    val loggingEnabled: Boolean = false,
-    val logServerBuffer: Boolean = false,
+    val loggingEnabled: Boolean = true,
+    val logServerBuffer: Boolean = true,
     val retentionDays: Int = 14,
     val logFolderUri: String? = null,
     val maxScrollbackLines: Int = 800,

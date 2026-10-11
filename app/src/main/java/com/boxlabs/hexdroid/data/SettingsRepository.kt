@@ -257,8 +257,8 @@ class SettingsRepository(private val ctx: Context) {
                         ThemeMode.valueOf(o.optString("themeMode", ThemeMode.LIGHT.name))
                     }.getOrDefault(ThemeMode.LIGHT),
                 compactMode = o.optBoolean("compactMode", false),
-                networkTabs = o.optBoolean("networkTabs", false),
-                networkTabsAtBottom = o.optBoolean("networkTabsAtBottom", false),
+                networkTabs = o.optBoolean("networkTabs", true),
+                networkTabsAtBottom = o.optBoolean("networkTabsAtBottom", true),
 
                 showTimestamps = o.optBoolean("showTimestamps", true),
                 timestampFormat = o.optString("timestampFormat", "HH:mm:ss"),
@@ -293,7 +293,7 @@ class SettingsRepository(private val ctx: Context) {
                     }
                 },
                 chatFontLineHeight = o.optDouble("chatFontLineHeight", 1.15).toFloat(),
-                chatMessageScale = o.optDouble("chatMessageScale", 0.60).toFloat().coerceIn(0.01f, 1.0f),
+                chatMessageScale = o.optDouble("chatMessageScale", 0.85).toFloat().coerceIn(0.01f, 1.0f),
                 nicklistFontOffset = o.optInt("nicklistFontOffset", 0),
                 customFontPath = o.optString("customFontPath", "").takeIf { it.isNotBlank() },
                 customChatFontPath = o.optString("customChatFontPath", "").takeIf { it.isNotBlank() },
@@ -307,7 +307,7 @@ class SettingsRepository(private val ctx: Context) {
                 bufferPaneFracLandscape = o.optDouble("bufferPaneFracLandscape", 0.22).toFloat(),
                 nickPaneFracLandscape = o.optDouble("nickPaneFracLandscape", 0.05).toFloat(),
 
-                hideJoinPartQuit = o.optBoolean("hideJoinPartQuit", false),
+                hideJoinPartQuit = o.optBoolean("hideJoinPartQuit", true),
                 hideHostnames = o.optBoolean("hideHostnames", false),
                 colorChannelEvents = o.optBoolean("colorChannelEvents", true),
                 hideAwayNotify = o.optBoolean("hideAwayNotify", false),
@@ -337,8 +337,8 @@ class SettingsRepository(private val ctx: Context) {
                     )
                 }.getOrDefault(com.boxlabs.hexdroid.VibrateIntensity.MEDIUM),
 
-                loggingEnabled = o.optBoolean("loggingEnabled", false),
-                logServerBuffer = o.optBoolean("logServerBuffer", false),
+                loggingEnabled = o.optBoolean("loggingEnabled", true),
+                logServerBuffer = o.optBoolean("logServerBuffer", true),
                 retentionDays = o.optInt("retentionDays", 14),
                 maxScrollbackLines = o.optInt("maxScrollbackLines", 800),
                 logFolderUri = o.optString("logFolderUri", "").takeIf { it.isNotBlank() },
