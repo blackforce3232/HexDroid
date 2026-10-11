@@ -3612,6 +3612,7 @@ fun ChatScreen(
                             linkStyle = linkStyle,
                             onAnnotationClick = onAnnotationClick,
                             colorizeNicks = state.settings.colorizeNicks,
+                            remoteNickStyle = ::nickStyleForMessage,
                             mircColorsEnabled = state.settings.mircColorsEnabled,
                             ansiColorsEnabled = state.settings.ansiColorsEnabled,
                             imagePreviewsEnabled = state.settings.imagePreviewsEnabled && selNetUnproxied,
@@ -6610,6 +6611,8 @@ private fun SingleMessageItem(
     linkStyle: SpanStyle,
     onAnnotationClick: (String, String) -> Unit,
     colorizeNicks: Boolean,
+    /** Remote special/BF nickname style, or null for normal rendering. */
+    remoteNickStyle: (String, Boolean) -> SpanStyle = { _, colorize -> SpanStyle(color = if (colorize) Color.Unspecified else Color.Unspecified) },
     mircColorsEnabled: Boolean,
     ansiColorsEnabled: Boolean,
     imagePreviewsEnabled: Boolean,
@@ -6897,7 +6900,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(nickStyleForMessage(fromBase, colorizeNicks)) {
+                        withStyle(remoteNickStyle(fromBase, colorizeNicks).copy(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
                             append(fromDisplay)
                         }
                         pop()
@@ -6925,7 +6928,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(nickStyleForMessage(fromBase, colorizeNicks)) {
+                        withStyle(remoteNickStyle(fromBase, colorizeNicks).copy(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
                             append(fromDisplay)
                         }
                         pop()
