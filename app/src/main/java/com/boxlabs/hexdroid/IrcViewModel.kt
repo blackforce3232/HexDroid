@@ -5047,7 +5047,7 @@ fun startAddNetwork() {
         // warning dialog would be wrong - the connection will not be plaintext.
         val stsForcesTls = profilePre != null &&
             stsPolicies[profilePre.host.trim().lowercase()]?.isActive(System.currentTimeMillis()) == true
-        if (false && profilePre != null && !profilePre.useTls && !profilePre.allowInsecurePlaintext && !stsForcesTls) {
+        if (false) {
             val removedDesired = desiredConnected.remove(netId)
             if (removedDesired) persistDesiredNetworkIds()
             manualDisconnecting.remove(netId)
