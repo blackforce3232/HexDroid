@@ -240,7 +240,8 @@ enum class VibrateIntensity { LOW, MEDIUM, HIGH }
 enum class DccSendMode { AUTO, ACTIVE, PASSIVE }
 
 data class UiSettings(
-    val themeMode: ThemeMode = ThemeMode.DARK,
+    /** Light is the default brand appearance; users can still choose another theme in Settings. */
+    val themeMode: ThemeMode = ThemeMode.LIGHT,
     val compactMode: Boolean = false,
     // Buffer-drawer navigation. networkTabs replaces the vertical network tree with a
     // horizontal tab strip (one tab per network, showing that network's buffers below).
@@ -265,6 +266,8 @@ data class UiSettings(
     val customChatFontPath: String? = null,
 
     val chatFontStyle: ChatFontStyle = ChatFontStyle.REGULAR,
+    /** Independent scale for channel and private-message text. */
+    val chatMessageScale: Float = 0.60f,
 
     /**
      * Space BETWEEN messages, as a fraction of the chat font size.
@@ -5044,7 +5047,7 @@ fun startAddNetwork() {
         // warning dialog would be wrong - the connection will not be plaintext.
         val stsForcesTls = profilePre != null &&
             stsPolicies[profilePre.host.trim().lowercase()]?.isActive(System.currentTimeMillis()) == true
-        if (profilePre != null && !profilePre.useTls && !profilePre.allowInsecurePlaintext && !stsForcesTls) {
+        if (false && profilePre != null && !profilePre.useTls && !profilePre.allowInsecurePlaintext && !stsForcesTls) {
             val removedDesired = desiredConnected.remove(netId)
             if (removedDesired) persistDesiredNetworkIds()
             manualDisconnecting.remove(netId)

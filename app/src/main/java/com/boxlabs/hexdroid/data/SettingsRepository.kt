@@ -254,8 +254,8 @@ class SettingsRepository(private val ctx: Context) {
             val o = JSONObject(json)
             UiSettings(
                 themeMode = runCatching {
-                    ThemeMode.valueOf(o.optString("themeMode", ThemeMode.DARK.name))
-                }.getOrDefault(ThemeMode.DARK),
+                        ThemeMode.valueOf(o.optString("themeMode", ThemeMode.LIGHT.name))
+                    }.getOrDefault(ThemeMode.LIGHT),
                 compactMode = o.optBoolean("compactMode", false),
                 networkTabs = o.optBoolean("networkTabs", false),
                 networkTabsAtBottom = o.optBoolean("networkTabsAtBottom", false),
@@ -293,6 +293,7 @@ class SettingsRepository(private val ctx: Context) {
                     }
                 },
                 chatFontLineHeight = o.optDouble("chatFontLineHeight", 1.15).toFloat(),
+                chatMessageScale = o.optDouble("chatMessageScale", 0.60).toFloat().coerceIn(0.01f, 1.0f),
                 nicklistFontOffset = o.optInt("nicklistFontOffset", 0),
                 customFontPath = o.optString("customFontPath", "").takeIf { it.isNotBlank() },
                 customChatFontPath = o.optString("customChatFontPath", "").takeIf { it.isNotBlank() },
@@ -411,6 +412,7 @@ class SettingsRepository(private val ctx: Context) {
         o.put("chatFontStyle", s.chatFontStyle.name)
         o.put("chatLineSpacing", s.chatLineSpacing.toDouble())
         o.put("chatFontLineHeight", s.chatFontLineHeight.toDouble())
+        o.put("chatMessageScale", s.chatMessageScale.toDouble())
         o.put("nicklistFontOffset", s.nicklistFontOffset)
         o.put("customFontPath", s.customFontPath ?: "")
         o.put("customChatFontPath", s.customChatFontPath ?: "")

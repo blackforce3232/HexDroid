@@ -894,6 +894,36 @@ fun SettingsScreen(
             }
 
             item {
+                val messageSteps = listOf(0.01f, 0.10f, 0.20f, 0.30f, 0.40f, 0.50f, 0.60f, 0.70f, 0.80f, 0.90f, 1.00f)
+                val currentIdx = messageSteps.indexOfMinBy { kotlin.math.abs(it - s.chatMessageScale) }
+                    .coerceIn(0, messageSteps.lastIndex)
+                Column {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text("Message text size", style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                        OutlinedButton(
+                            onClick = { if (currentIdx > 0) onUpdate { copy(chatMessageScale = messageSteps[currentIdx - 1]) } },
+                            enabled = currentIdx > 0,
+                            modifier = Modifier.widthIn(min = 40.dp).focusHighlight(RoundedCornerShape(50))
+                        ) { Text("−") }
+                        Text("${(messageSteps[currentIdx] * 100).toInt()}%", modifier = Modifier.padding(horizontal = 10.dp))
+                        OutlinedButton(
+                            onClick = { if (currentIdx < messageSteps.lastIndex) onUpdate { copy(chatMessageScale = messageSteps[currentIdx + 1]) } },
+                            enabled = currentIdx < messageSteps.lastIndex,
+                            modifier = Modifier.widthIn(min = 40.dp).focusHighlight(RoundedCornerShape(50))
+                        ) { Text("+") }
+                    }
+                    if (!isTvDevice()) {
+                        Slider(
+                            value = currentIdx.toFloat(),
+                            onValueChange = { v -> onUpdate { copy(chatMessageScale = messageSteps[v.toInt().coerceIn(0, messageSteps.lastIndex)]) } },
+                            valueRange = 0f..messageSteps.lastIndex.toFloat(),
+                            steps = messageSteps.lastIndex - 1,
+                        )
+                    }
+                }
+            }
+
+            item {
                 // Gap between messages. Glyph size is the font-size slider above and the
                 // leading within a message is the control below, so all three are
                 // independent of each other.

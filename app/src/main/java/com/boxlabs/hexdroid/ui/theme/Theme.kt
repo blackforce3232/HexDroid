@@ -184,7 +184,7 @@ val LocalAccentColors = staticCompositionLocalOf { DefaultAccents }
 
 @Composable
 fun HexDroidIRCTheme(
-    themeMode: ThemeMode = ThemeMode.DARK,
+    themeMode: ThemeMode = ThemeMode.LIGHT,
     // Unused; the theme mode decides dynamic colour. Kept for call-site compatibility.
     @Suppress("UNUSED_PARAMETER") dynamicColor: Boolean = false,
     fontChoice: FontChoice = FontChoice.OPEN_SANS,

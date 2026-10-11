@@ -2787,13 +2787,15 @@ fun ChatScreen(
     // scrollback on every recomposition.
     val bodyMedium = MaterialTheme.typography.bodyMedium
     val chatLineHeightFactor = state.settings.chatFontLineHeight.coerceIn(0.9f, 2.0f)
-    val chatTextStyle = remember(bodyMedium, chatFontFamily, baseWeight, baseStyle, chatLineHeightFactor) {
+    val chatMessageScale = state.settings.chatMessageScale.coerceIn(0.01f, 1.0f)
+    val chatTextStyle = remember(bodyMedium, chatFontFamily, baseWeight, baseStyle, chatLineHeightFactor, chatMessageScale) {
         bodyMedium.copy(
             fontFamily = chatFontFamily,
             fontWeight = baseWeight,
             fontStyle = baseStyle,
+            fontSize = bodyMedium.fontSize * chatMessageScale,
             // Font line height: the leading between the wrapped lines of ONE message.
-            lineHeight = bodyMedium.fontSize * chatLineHeightFactor,
+            lineHeight = bodyMedium.fontSize * chatMessageScale * chatLineHeightFactor,
             platformStyle = PlatformTextStyle(includeFontPadding = false),
             lineHeightStyle = LineHeightStyle(
                 alignment = LineHeightStyle.Alignment.Center,
