@@ -54,6 +54,7 @@ data class RemoteNickStylesSnapshot(
 ) {
     fun specialRule(nick: String): SpecialNickRule? = special[ircFoldNick(nick)]
     fun bfRule(nick: String): BfNickRule? = bf[ircFoldNick(nick)]
+    fun colorArgb(nick: String): Int? = bfRule(nick)?.colorArgb ?: specialRule(nick)?.colorArgb
 }
 
 internal fun ircFoldNick(value: String): String = value.trim().trimStart('~', '&', '@', '%', '+')
@@ -179,12 +180,12 @@ class RemoteNickStyles(private val context: Context) {
                 val v = bf.getJSONObject(nick); ircFoldNick(nick) to BfNickRule(
                     v.optString("font").takeIf(String::isNotBlank),
                     v.optDouble("size", Double.NaN).toFloat().takeIf(Float::isFinite),
-                    v.optInt("color").takeIf { v.has("color") },
-                    v.optInt("weight").takeIf { v.has("weight") },
+                    v.optInt("color").takeIf { !v.isNull("color") },
+                    v.optInt("weight").takeIf { !v.isNull("weight") },
                     v.optBoolean("italic"),
                     v.optDouble("spacing", Double.NaN).toFloat().takeIf(Float::isFinite),
                     v.optJSONArray("gradient")?.let { a -> (0 until a.length()).map { a.getInt(it) } }.orEmpty(),
-                    v.optInt("shadowColor").takeIf { v.has("shadowColor") },
+                    v.optInt("shadowColor").takeIf { !v.isNull("shadowColor") },
                     v.optDouble("shadowRadius", 0.0).toFloat().coerceIn(0f, 8f),
                     v.optDouble("shadowDx", 0.0).toFloat().coerceIn(-8f, 8f),
                     v.optDouble("shadowDy", 0.0).toFloat().coerceIn(-8f, 8f),
@@ -271,9 +272,10 @@ class RemoteNickStyles(private val context: Context) {
         fun parseCssShadows(js: String): Map<String, ParsedShadow> = Regex("\\.(bfrenK[A-Za-z0-9_-]+)\\s*\\{([^}]+)\\}")
             .findAll(js).mapNotNull { m ->
                 val value = Regex("text-shadow:\\s*([^;]+)").find(m.groupValues[2])?.groupValues?.get(1) ?: return@mapNotNull null
-                val match = Regex("(-?[0-9.]+)px\\s+(-?[0-9.]+)px\\s+([0-9.]+)px\\s+(#[0-9a-fA-F]{6}|rgba?\\([^)]*\\))").find(value) ?: return@mapNotNull null
-                val dx = match.groupValues[1].toFloatOrNull() ?: return@mapNotNull null
-                val dy = match.groupValues[2].toFloatOrNull() ?: return@mapNotNull null
+                // CSS allows unitless zero offsets (e.g. "0 0 5px rgba(...)").
+                val match = Regex("(-?(?:0|[0-9.]+px))\\s+(-?(?:0|[0-9.]+px))\\s+([0-9.]+)px\\s+(#[0-9a-fA-F]{6}|rgba?\\([^)]*\\))").find(value) ?: return@mapNotNull null
+                val dx = match.groupValues[1].removeSuffix("px").toFloatOrNull() ?: return@mapNotNull null
+                val dy = match.groupValues[2].removeSuffix("px").toFloatOrNull() ?: return@mapNotNull null
                 val radius = match.groupValues[3].toFloatOrNull() ?: return@mapNotNull null
                 val color = parseCssColorsFromValue(match.groupValues[4]).firstOrNull() ?: return@mapNotNull null
                 m.groupValues[1] to ParsedShadow(color, radius.coerceIn(0f, 8f), dx.coerceIn(-8f, 8f), dy.coerceIn(-8f, 8f))

@@ -1688,8 +1688,7 @@ fun ChatScreen(
         val base = baseNick(nick).lowercase()
         val custom = state.settings.ownNickColorInt
         if (custom != null && base in allMyNicks) return Color(custom)
-        specialNickRule(base)?.let { return Color(it.colorArgb) }
-        bfNickRule(base)?.colorArgb?.let { return Color(it) }
+        state.remoteNickStyles.colorArgb(base)?.let { return Color(it) }
         // A user's self-chosen colour (via metadata) wins over the hash, but never
         // over your own manual override for your own nick, handled above.
         metadataNickColor(base)?.let { return it }
@@ -1702,21 +1701,20 @@ fun ChatScreen(
     fun nickStyleForMessage(nick: String, colorize: Boolean): SpanStyle {
         val base = baseNick(nick).lowercase()
         val special = specialNickRule(base)
-        val bf = if (special == null) bfNickRule(base) else null
+        val bf = bfNickRule(base)
         val own = state.settings.ownNickColorInt?.takeIf { base in allMyNicks }
         val selectedColor = when {
             !colorize -> Color.Unspecified
             own != null -> Color(own)
-            special != null -> Color(special.colorArgb)
-            bf?.colorArgb != null -> Color(bf.colorArgb)
-            else -> nickColor(base)
+            else -> state.remoteNickStyles.colorArgb(base)?.let { Color(it) } ?: nickColor(base)
         }
-        val gradientBrush = if (colorize) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
+        val gradientBrush = if (colorize && own == null) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
             Brush.linearGradient(colors.map { Color(it) })
         } else null
         return SpanStyle(
             color = selectedColor,
-            fontWeight = if (special?.bold == true) FontWeight.Bold else bf?.fontWeight?.let { FontWeight(it.coerceIn(100, 900)) },
+            fontWeight = bf?.fontWeight?.let { FontWeight(it.coerceIn(100, 900)) }
+                ?: if (bf != null || special?.bold == true) FontWeight.Bold else null,
             fontStyle = bf?.let { if (it.italic) FontStyle.Italic else FontStyle.Normal },
             fontFamily = bf?.fontFamily?.let { loadedNickFonts[it] },
             fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
@@ -2493,23 +2491,25 @@ fun ChatScreen(
                         } else if (metadataAvatars.isNotEmpty()) {
                             Spacer(Modifier.width(avatarSize + avatarGap))
                         }
-                        val nickGradient = if (state.settings.colorizeNicks) bfNickRule(cleaned)?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
+                        val bf = bfNickRule(cleaned)
+                        val special = specialNickRule(cleaned)
+                        val hasOwnColor = state.settings.ownNickColorInt != null && cleaned.lowercase() in allMyNicks
+                        val nickGradient = if (state.settings.colorizeNicks && !hasOwnColor) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
                             Brush.linearGradient(colors.map { Color(it) })
                         } else null
                         Text(
                             n,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = nickColor(cleaned),
-                                fontWeight = (specialNickRule(cleaned)?.bold == true ||
-                                    (specialNickRule(cleaned) == null && bfNickRule(cleaned)?.fontWeight?.let { it >= 600 } == true))
-                                    .let { if (it) FontWeight.Bold else FontWeight.Normal },
-                                fontStyle = bfNickRule(cleaned)?.let { if (it.italic) FontStyle.Italic else FontStyle.Normal } ?: FontStyle.Normal,
-                                fontFamily = bfNickRule(cleaned)?.fontFamily?.let { loadedNickFonts[it] },
-                                fontSize = bfNickRule(cleaned)?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: nickFontSp.sp,
+                                fontWeight = bf?.fontWeight?.let { FontWeight(it.coerceIn(100, 900)) }
+                                    ?: if (bf != null || special?.bold == true) FontWeight.Bold else FontWeight.Normal,
+                                fontStyle = bf?.let { if (it.italic) FontStyle.Italic else FontStyle.Normal } ?: FontStyle.Normal,
+                                fontFamily = bf?.fontFamily?.let { loadedNickFonts[it] },
+                                fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: nickFontSp.sp,
                                 lineHeight = (nickFontSp * 1.15f).sp,
-                                letterSpacing = bfNickRule(cleaned)?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
-                                shadow = bfNickRule(cleaned)?.shadowColor?.let { shadowColor ->
-                                    androidx.compose.ui.graphics.Shadow(Color(shadowColor), androidx.compose.ui.geometry.Offset(bfNickRule(cleaned)?.shadowOffsetXDp ?: 0f, bfNickRule(cleaned)?.shadowOffsetYDp ?: 0f), bfNickRule(cleaned)?.shadowRadiusDp ?: 0f)
+                                letterSpacing = bf?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
+                                shadow = bf?.shadowColor?.let { shadowColor ->
+                                    androidx.compose.ui.graphics.Shadow(Color(shadowColor), androidx.compose.ui.geometry.Offset(bf.shadowOffsetXDp, bf.shadowOffsetYDp), bf.shadowRadiusDp)
                                 },
                             ).let { style -> if (nickGradient != null) style.copy(brush = nickGradient) else style },
                             maxLines = 1,

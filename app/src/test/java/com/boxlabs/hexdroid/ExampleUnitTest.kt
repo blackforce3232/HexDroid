@@ -2,6 +2,8 @@ package com.boxlabs.hexdroid
 
 import org.junit.Test
 import com.boxlabs.hexdroid.data.RemoteNickStyles
+import com.boxlabs.hexdroid.data.RemoteNickStylesSnapshot
+import com.boxlabs.hexdroid.data.BfNickRule
 
 import org.junit.Assert.*
 
@@ -55,5 +57,30 @@ class ExampleUnitTest {
             RemoteNickStyles.parseSpecialNicks("\"Queen\": [\"#f600fb\", \"Role\", false]")["queen"],
             RemoteNickStyles.parseSpecialNicks("\"Queen\": [\"#f600fb\", \"Role\", false]")["QUEEN"],
         )
+    }
+
+    @Test
+    fun bfStyle166TakesPriorityOverSpecialNickColor() {
+        val special = RemoteNickStyles.parseSpecialNicks("\"Freja\": [\"#b18cfe\", \"Role\", false]")
+        val ids = RemoteNickStyles.parseNickStyles("var nickStyles = { \"Freja\": 166 };")
+        val designs = RemoteNickStyles.parseDesigns(
+            "window.tasarımlar = { 166: { classes: ['bfFnt140', 'bfrenK632', 'animate__animated', 'animate__pulse'] } };"
+        )
+        val css = ".bfFnt140 { font-size: 12px; font-family: 'Titan One', sans-serif; font-weight: 400; } " +
+            ".bfrenK632 { color: #ff4081; text-shadow: 0 0 5px rgba(255, 64, 129, 0.5); }"
+        val classes = designs.getValue(ids.getValue("freja"))
+        assertEquals(listOf("bfFnt140", "bfrenK632", "animate__animated", "animate__pulse"), classes)
+        assertEquals("Titan One" to 12f, RemoteNickStyles.parseCssFonts(css)[classes.first()])
+        assertEquals("400", RemoteNickStyles.parseFontProperties(css, "bfFnt140")["font-weight"])
+        val color = RemoteNickStyles.parseCssColors(css)[classes[1]]
+        val snapshot = RemoteNickStylesSnapshot(special, mapOf("freja" to BfNickRule("Titan One", 12f, color)))
+        assertEquals(0xFFFF4081.toInt(), snapshot.colorArgb("Freja"))
+        assertEquals(0xFFB18CFE.toInt(), snapshot.specialRule("Freja")?.colorArgb)
+        assertEquals(0xFFB18CFE.toInt(), RemoteNickStylesSnapshot(special).colorArgb("Freja"))
+        val shadow = RemoteNickStyles.parseCssShadows(css)["bfrenK632"]
+        assertEquals(0x7FFF4081, shadow?.color)
+        assertEquals(5f, shadow?.radius)
+        assertEquals(0f, shadow?.dx)
+        assertEquals(0f, shadow?.dy)
     }
 }
