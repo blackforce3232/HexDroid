@@ -1,5 +1,5 @@
 name: Debug APK
-on: [workflow_dispatch, push]
+on: workflow_dispatch
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,3 +13,4 @@ jobs:
         with:
           name: hexdroid-debug
           path: app/build/outputs/apk/debug/*.apk
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Projeler\keys\hexdroid.jks")) | Set-Clipboard
