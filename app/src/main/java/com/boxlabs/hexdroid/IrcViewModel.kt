@@ -8213,6 +8213,12 @@ if (code == "442") {
                 val line = if (isMe) "* " + appContext.getString(R.string.vm_ev_you_now_known_as, ev.newNick)
                 else "* " + appContext.getString(R.string.vm_ev_now_known_as, ev.oldNick, ev.newNick)
 
+                if (st0.settings.hideJoinPartQuit) {
+                    // Nick changes are JOIN/PART/QUIT-style presence events. Keep the nicklist
+                    // state update below, but do not emit an informational chat line.
+                    // Topic and mode events remain unaffected by this preference.
+                }
+
                 // Determine which channel buffers to print to.
                 // Prefer channels where we currently see the old nick in the nicklist; otherwise
                 // fall back to all joined channels for this network.
@@ -8243,7 +8249,7 @@ if (code == "442") {
                 }
 
                 val lineColoured = colorEvent(line, 10)  // cyan
-                for (k in targets) {
+                if (!st0.settings.hideJoinPartQuit) for (k in targets) {
                     append(
                         k,
                         from = null,
@@ -8256,7 +8262,7 @@ if (code == "442") {
                 }
 
                 // If we couldn't attribute this nick to any channel buffers, surface it in the server buffer.
-                if (targets.isEmpty()) {
+                if (targets.isEmpty() && !st0.settings.hideJoinPartQuit) {
                     append(
                         bufKey(netId, "*server*"),
                         from = null,
