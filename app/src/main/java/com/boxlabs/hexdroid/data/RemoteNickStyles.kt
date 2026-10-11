@@ -3,6 +3,10 @@ package com.boxlabs.hexdroid.data
 import android.content.Context
 import android.graphics.Typeface
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -16,7 +20,22 @@ import java.util.concurrent.TimeUnit
 
 data class SpecialNickRule(val colorArgb: Int, val bold: Boolean)
 
-data class BfNickRule(val fontFamily: String?, val fontSizeSp: Float?, val colorArgb: Int?)
+data class BfNickRule(
+    val fontFamily: String?,
+    val fontSizeSp: Float?,
+    val colorArgb: Int?,
+    val fontWeight: Int? = null,
+    val italic: Boolean = false,
+    val letterSpacingSp: Float? = null,
+) {
+    fun toSpanStyle(font: FontFamily?): androidx.compose.ui.text.SpanStyle = androidx.compose.ui.text.SpanStyle(
+        fontFamily = font,
+        fontSize = fontSizeSp?.coerceIn(9f, 24f)?.sp ?: TextUnit.Unspecified,
+        fontWeight = fontWeight?.let { FontWeight(it.coerceIn(100, 900)) },
+        fontStyle = if (italic) FontStyle.Italic else FontStyle.Normal,
+        letterSpacing = letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: TextUnit.Unspecified,
+    )
+}
 
 data class RemoteNickStylesSnapshot(
     val special: Map<String, SpecialNickRule> = emptyMap(),
@@ -70,7 +89,15 @@ class RemoteNickStyles(private val context: Context) {
                 val fontClass = classes.firstOrNull { it.startsWith("bfFnt") }
                 val colorClass = classes.firstOrNull { it.startsWith("bfrenK") }
                 val font = fontClass?.let(fonts::get)
-                nick to BfNickRule(font?.first, font?.second, colorClass?.let(colors::get))
+                val cssProps = fontClass?.let { parseFontProperties(bfCss, it) }.orEmpty()
+                nick to BfNickRule(
+                    font?.first,
+                    font?.second,
+                    colorClass?.let(colors::get),
+                    cssProps["font-weight"]?.toIntOrNull(),
+                    cssProps["font-style"] == "italic",
+                    cssProps["letter-spacing"]?.removeSuffix("px")?.toFloatOrNull(),
+                )
             }.toMap()
             if (special.isEmpty()) throw IllegalArgumentException("Uzak özel nick yapılandırması boş veya tanınmayan biçimde")
             val next = RemoteNickStylesSnapshot(special, bf, System.currentTimeMillis())
@@ -110,7 +137,11 @@ class RemoteNickStyles(private val context: Context) {
         val special = JSONObject()
         s.special.forEach { (nick, r) -> special.put(nick, JSONObject().put("color", r.colorArgb).put("bold", r.bold)) }
         val bf = JSONObject()
-        s.bf.forEach { (nick, r) -> bf.put(nick, JSONObject().put("font", r.fontFamily).put("size", r.fontSizeSp).put("color", r.colorArgb)) }
+        s.bf.forEach { (nick, r) ->
+            bf.put(nick, JSONObject().put("font", r.fontFamily).put("size", r.fontSizeSp)
+                .put("color", r.colorArgb).put("weight", r.fontWeight).put("italic", r.italic)
+                .put("spacing", r.letterSpacingSp))
+        }
         return root.put("special", special).put("bf", bf).toString()
     }
 
@@ -123,7 +154,14 @@ class RemoteNickStyles(private val context: Context) {
                 val v = special.getJSONObject(nick); ircFoldNick(nick) to SpecialNickRule(v.getInt("color"), v.optBoolean("bold"))
             },
             bf.keys().asSequence().asIterable().associate { nick ->
-                val v = bf.getJSONObject(nick); ircFoldNick(nick) to BfNickRule(v.optString("font").takeIf(String::isNotBlank), v.optDouble("size", Double.NaN).toFloat().takeIf(Float::isFinite), v.optInt("color").takeIf { v.has("color") })
+                val v = bf.getJSONObject(nick); ircFoldNick(nick) to BfNickRule(
+                    v.optString("font").takeIf(String::isNotBlank),
+                    v.optDouble("size", Double.NaN).toFloat().takeIf(Float::isFinite),
+                    v.optInt("color").takeIf { v.has("color") },
+                    v.optInt("weight").takeIf { v.has("weight") },
+                    v.optBoolean("italic"),
+                    v.optDouble("spacing", Double.NaN).toFloat().takeIf(Float::isFinite),
+                )
             },
             root.optLong("fetchedAt"),
         )
@@ -165,6 +203,15 @@ class RemoteNickStyles(private val context: Context) {
             val size = Regex("font-size:\\s*([0-9.]+)px").find(block)?.groupValues?.get(1)?.toFloatOrNull() ?: return@mapNotNull null
             m.groupValues[1] to (family to size.coerceIn(9f, 24f))
         }.toMap()
+
+        fun parseFontProperties(js: String, className: String): Map<String, String> {
+            val block = fontEntry.findAll(js).firstOrNull { it.groupValues[1] == className }
+                ?.groupValues?.get(2) ?: return emptyMap()
+            return block.split(';').mapNotNull { declaration ->
+                val colon = declaration.indexOf(':')
+                if (colon <= 0) null else declaration.substring(0, colon).trim() to declaration.substring(colon + 1).trim()
+            }.toMap()
+        }
     }
 }
 

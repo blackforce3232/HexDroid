@@ -33,6 +33,12 @@ class ExampleUnitTest {
         val css = ".bfFnt132 { font-size: 15px; font-family: 'Amatic SC', cursive; } .bfrenK24 { color: #ff3366; }"
         assertEquals("Amatic SC", RemoteNickStyles.parseCssFonts(css)["bfFnt132"]?.first)
         assertEquals(0xFFFF3366.toInt(), RemoteNickStyles.parseCssColors(css)["bfrenK24"])
+
+        val styledCss = ".bfFnt23 { font-size: 14px; font-family: 'Charmonman', cursive; font-weight: 900; font-style: italic; letter-spacing: 2px; }"
+        val properties = RemoteNickStyles.parseFontProperties(styledCss, "bfFnt23")
+        assertEquals("900", properties["font-weight"])
+        assertEquals("italic", properties["font-style"])
+        assertEquals("2px", properties["letter-spacing"])
     }
 
     @Test

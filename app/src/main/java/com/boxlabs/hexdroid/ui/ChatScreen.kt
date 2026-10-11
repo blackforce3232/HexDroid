@@ -1713,9 +1713,11 @@ fun ChatScreen(
         }
         return SpanStyle(
             color = selectedColor,
-            fontWeight = if (special?.bold == true) FontWeight.Bold else null,
+            fontWeight = if (special?.bold == true) FontWeight.Bold else bf?.fontWeight?.let { FontWeight(it.coerceIn(100, 900)) },
+            fontStyle = bf?.let { if (it.italic) FontStyle.Italic else FontStyle.Normal },
             fontFamily = bf?.fontFamily?.let { loadedNickFonts[it] },
             fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
+            letterSpacing = bf?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
         )
     }
 
@@ -2486,8 +2488,10 @@ fun ChatScreen(
                             color = if (state.settings.colorizeNicks)
                                 nickColor(cleaned)
                             else Color.Unspecified,
-                            fontWeight = if (specialNickRule(cleaned)?.bold == true) FontWeight.Bold else FontWeight.Normal,
+                            fontWeight = (specialNickRule(cleaned)?.bold == true || (specialNickRule(cleaned) == null && bfNickRule(cleaned)?.fontWeight?.let { it >= 600 } == true)).let { if (it) FontWeight.Bold else FontWeight.Normal },
+                            fontStyle = bfNickRule(cleaned)?.let { if (it.italic) FontStyle.Italic else FontStyle.Normal } ?: FontStyle.Normal,
                             fontFamily = bfNickRule(cleaned)?.fontFamily?.let { loadedNickFonts[it] },
+                            letterSpacing = bfNickRule(cleaned)?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
                             fontSize = nickFontSp.sp,
                             lineHeight = (nickFontSp * 1.15f).sp,
                             maxLines = 1,
