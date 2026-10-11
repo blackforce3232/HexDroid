@@ -1718,6 +1718,18 @@ fun ChatScreen(
             fontFamily = bf?.fontFamily?.let { loadedNickFonts[it] },
             fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
             letterSpacing = bf?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
+            brush = if (colorize) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { Brush.linearGradient(it.map { argb -> Color(argb) }) } else null,
+            shadow = bf?.shadowColor?.let { androidx.compose.ui.graphics.Shadow(Color(it), androidx.compose.ui.geometry.Offset(bf.shadowOffsetXDp, bf.shadowOffsetYDp), bf.shadowRadiusDp) },
+            brush = if (colorize) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
+                Brush.linearGradient(colors.map { Color(it) })
+            },
+            shadow = bf?.shadowColor?.let { shadowColor ->
+                androidx.compose.ui.graphics.Shadow(
+                    color = Color(shadowColor),
+                    offset = androidx.compose.ui.geometry.Offset(bf.shadowOffsetXDp, bf.shadowOffsetYDp),
+                    blurRadius = bf.shadowRadiusDp,
+                )
+            },
         )
     }
 
@@ -2485,15 +2497,21 @@ fun ChatScreen(
                         }
                         Text(
                             n,
-                            color = if (state.settings.colorizeNicks)
-                                nickColor(cleaned)
-                            else Color.Unspecified,
-                            fontWeight = (specialNickRule(cleaned)?.bold == true || (specialNickRule(cleaned) == null && bfNickRule(cleaned)?.fontWeight?.let { it >= 600 } == true)).let { if (it) FontWeight.Bold else FontWeight.Normal },
-                            fontStyle = bfNickRule(cleaned)?.let { if (it.italic) FontStyle.Italic else FontStyle.Normal } ?: FontStyle.Normal,
-                            fontFamily = bfNickRule(cleaned)?.fontFamily?.let { loadedNickFonts[it] },
-                            letterSpacing = bfNickRule(cleaned)?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
-                            fontSize = nickFontSp.sp,
-                            lineHeight = (nickFontSp * 1.15f).sp,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = nickColor(cleaned),
+                                fontWeight = (specialNickRule(cleaned)?.bold == true ||
+                                    (specialNickRule(cleaned) == null && bfNickRule(cleaned)?.fontWeight?.let { it >= 600 } == true))
+                                    .let { if (it) FontWeight.Bold else FontWeight.Normal },
+                                fontStyle = bfNickRule(cleaned)?.let { if (it.italic) FontStyle.Italic else FontStyle.Normal } ?: FontStyle.Normal,
+                                fontFamily = bfNickRule(cleaned)?.fontFamily?.let { loadedNickFonts[it] },
+                                fontSize = bfNickRule(cleaned)?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: nickFontSp.sp,
+                                lineHeight = (nickFontSp * 1.15f).sp,
+                                letterSpacing = bfNickRule(cleaned)?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
+                                brush = if (state.settings.colorizeNicks) bfNickRule(cleaned)?.gradientColors?.takeIf { it.size >= 2 }?.let { colors -> Brush.linearGradient(colors.map { Color(it) }) } else null,
+                                shadow = bfNickRule(cleaned)?.shadowColor?.let { shadowColor ->
+                                    androidx.compose.ui.graphics.Shadow(Color(shadowColor), androidx.compose.ui.geometry.Offset(bfNickRule(cleaned)?.shadowOffsetXDp ?: 0f, bfNickRule(cleaned)?.shadowOffsetYDp ?: 0f), bfNickRule(cleaned)?.shadowRadiusDp ?: 0f)
+                                },
+                            ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             // Fade an away nick a touch further, on top of the row tint.
@@ -6904,7 +6922,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(remoteNickStyle(fromBase, colorizeNicks).copy(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
+                        withStyle(remoteNickStyle(fromBase, colorizeNicks)) {
                             append(fromDisplay)
                         }
                         pop()
@@ -6932,7 +6950,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(remoteNickStyle(fromBase, colorizeNicks).copy(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
+                        withStyle(remoteNickStyle(fromBase, colorizeNicks)) {
                             append(fromDisplay)
                         }
                         pop()

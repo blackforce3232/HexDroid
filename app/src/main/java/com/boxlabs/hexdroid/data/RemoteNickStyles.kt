@@ -7,6 +7,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color as ComposeColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -27,14 +28,21 @@ data class BfNickRule(
     val fontWeight: Int? = null,
     val italic: Boolean = false,
     val letterSpacingSp: Float? = null,
+    val gradientColors: List<Int> = emptyList(),
+    val shadowColor: Int? = null,
+    val shadowRadiusDp: Float = 0f,
+    val shadowOffsetXDp: Float = 0f,
+    val shadowOffsetYDp: Float = 0f,
 ) {
     fun toSpanStyle(font: FontFamily?): androidx.compose.ui.text.SpanStyle = androidx.compose.ui.text.SpanStyle(
         fontFamily = font,
         fontSize = fontSizeSp?.coerceIn(9f, 24f)?.sp ?: TextUnit.Unspecified,
         fontWeight = fontWeight?.let { FontWeight(it.coerceIn(100, 900)) },
-        fontStyle = if (italic) FontStyle.Italic else FontStyle.Normal,
-        letterSpacing = letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: TextUnit.Unspecified,
-    )
+            fontStyle = if (italic) FontStyle.Italic else FontStyle.Normal,
+            letterSpacing = letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: TextUnit.Unspecified,
+            brush = gradientColors.takeIf { it.size >= 2 }?.let { androidx.compose.ui.graphics.Brush.linearGradient(it.map(androidx.compose.ui.graphics.Color::invoke)) },
+            shadow = shadowColor?.let { androidx.compose.ui.graphics.Shadow(androidx.compose.ui.graphics.Color(it), androidx.compose.ui.geometry.Offset(shadowOffsetXDp, shadowOffsetYDp), shadowRadiusDp) },
+        )
 }
 
 data class RemoteNickStylesSnapshot(
@@ -84,12 +92,17 @@ class RemoteNickStyles(private val context: Context) {
             val bfStyleIds = parseDesigns(bfCss)
             val colors = parseCssColors(bfCss)
             val fonts = parseCssFonts(bfCss)
+            val gradients = parseCssGradients(bfCss)
+            val shadows = parseCssShadows(bfCss)
             val bf = bfNames.mapNotNull { (nick, id) ->
                 val classes = bfStyleIds[id] ?: return@mapNotNull null
                 val fontClass = classes.firstOrNull { it.startsWith("bfFnt") }
                 val colorClass = classes.firstOrNull { it.startsWith("bfrenK") }
+                val gradientClass = classes.firstOrNull { it.startsWith("bfGad") }
                 val font = fontClass?.let(fonts::get)
                 val cssProps = fontClass?.let { parseFontProperties(bfCss, it) }.orEmpty()
+                val gradient = gradientClass?.let(gradients::get).orEmpty()
+                val shadow = colorClass?.let(shadows::get)
                 nick to BfNickRule(
                     font?.first,
                     font?.second,
@@ -97,6 +110,11 @@ class RemoteNickStyles(private val context: Context) {
                     cssProps["font-weight"]?.toIntOrNull(),
                     cssProps["font-style"] == "italic",
                     cssProps["letter-spacing"]?.removeSuffix("px")?.toFloatOrNull(),
+                    gradient,
+                    shadow?.color,
+                    shadow?.radius ?: 0f,
+                    shadow?.dx ?: 0f,
+                    shadow?.dy ?: 0f,
                 )
             }.toMap()
             if (special.isEmpty()) throw IllegalArgumentException("Uzak özel nick yapılandırması boş veya tanınmayan biçimde")
@@ -139,8 +157,10 @@ class RemoteNickStyles(private val context: Context) {
         val bf = JSONObject()
         s.bf.forEach { (nick, r) ->
             bf.put(nick, JSONObject().put("font", r.fontFamily).put("size", r.fontSizeSp)
-                .put("color", r.colorArgb).put("weight", r.fontWeight).put("italic", r.italic)
-                .put("spacing", r.letterSpacingSp))
+            .put("color", r.colorArgb).put("weight", r.fontWeight).put("italic", r.italic)
+            .put("spacing", r.letterSpacingSp).put("gradient", org.json.JSONArray(r.gradientColors))
+            .put("shadowColor", r.shadowColor).put("shadowRadius", r.shadowRadiusDp)
+            .put("shadowDx", r.shadowOffsetXDp).put("shadowDy", r.shadowOffsetYDp))
         }
         return root.put("special", special).put("bf", bf).toString()
     }
@@ -161,6 +181,11 @@ class RemoteNickStyles(private val context: Context) {
                     v.optInt("weight").takeIf { v.has("weight") },
                     v.optBoolean("italic"),
                     v.optDouble("spacing", Double.NaN).toFloat().takeIf(Float::isFinite),
+                    v.optJSONArray("gradient")?.let { a -> (0 until a.length()).map { a.getInt(it) } }.orEmpty(),
+                    v.optInt("shadowColor").takeIf { v.has("shadowColor") },
+                    v.optDouble("shadowRadius", 0.0).toFloat().coerceIn(0f, 8f),
+                    v.optDouble("shadowDx", 0.0).toFloat().coerceIn(-8f, 8f),
+                    v.optDouble("shadowDy", 0.0).toFloat().coerceIn(-8f, 8f),
                 )
             },
             root.optLong("fetchedAt"),
@@ -188,8 +213,26 @@ class RemoteNickStyles(private val context: Context) {
             return nickStyleEntry.findAll(body).associate { ircFoldNick(it.groupValues[1]) to it.groupValues[2].toInt() }
         }
 
-        fun parseDesigns(js: String): Map<Int, List<String>> = designEntry.findAll(js).associate { m ->
-            m.groupValues[1].toInt() to classEntry.findAll(m.groupValues[2]).map { it.groupValues[1] }.toList()
+        fun parseDesigns(js: String): Map<Int, List<String>> {
+            // Find the actual `window.tasarımlar = { ... }` object, ignoring commented-out
+            // examples elsewhere in the file. Each outer numeric entry's classes array is
+            // extracted with balanced braces because the legacy file has the whole object on
+            // one line and design declarations contain arbitrary whitespace/comments.
+            val marker = js.indexOf("window.tasarımlar")
+            if (marker < 0) return emptyMap()
+            val start = js.indexOf('{', marker)
+            if (start < 0) return emptyMap()
+            val out = linkedMapOf<Int, List<String>>()
+            val entryStart = Regex("(\\d+)\\s*:\\s*\\{\\s*classes\\s*:\\s*\\[").findAll(js.substring(start + 1))
+            for (m in entryStart) {
+                val id = m.groupValues[1].toIntOrNull() ?: continue
+                val classesStart = start + 1 + m.range.last + 1
+                val classesEnd = js.indexOf(']', classesStart)
+                if (classesEnd < 0) continue
+                val classes = classEntry.findAll(js.substring(classesStart, classesEnd)).map { it.groupValues[1] }.toList()
+                if (classes.isNotEmpty()) out[id] = classes
+            }
+            return out
         }
 
         fun parseCssColors(js: String): Map<String, Int> = colorEntry.findAll(js).mapNotNull { m ->
@@ -211,6 +254,40 @@ class RemoteNickStyles(private val context: Context) {
                 val colon = declaration.indexOf(':')
                 if (colon <= 0) null else declaration.substring(0, colon).trim() to declaration.substring(colon + 1).trim()
             }.toMap()
+        }
+
+        data class ParsedShadow(val color: Int, val radius: Float, val dx: Float, val dy: Float)
+
+        fun parseCssGradients(js: String): Map<String, List<Int>> = Regex("\\.(bfGad[A-Za-z0-9_-]+)\\s*\\{([^}]+)\\}")
+            .findAll(js).mapNotNull { m ->
+                val gradient = Regex("linear-gradient\\(([^)]*)\\)").find(m.groupValues[2])?.groupValues?.get(1)
+                    ?: return@mapNotNull null
+                val colors = parseCssColorsFromValue(gradient)
+                if (colors.size >= 2) m.groupValues[1] to colors.take(4) else null
+            }.toMap()
+
+        fun parseCssShadows(js: String): Map<String, ParsedShadow> = Regex("\\.(bfrenK[A-Za-z0-9_-]+)\\s*\\{([^}]+)\\}")
+            .findAll(js).mapNotNull { m ->
+                val value = Regex("text-shadow:\\s*([^;]+)").find(m.groupValues[2])?.groupValues?.get(1) ?: return@mapNotNull null
+                val match = Regex("(-?[0-9.]+)px\\s+(-?[0-9.]+)px\\s+([0-9.]+)px\\s+(#[0-9a-fA-F]{6}|rgba?\\([^)]*\\))").find(value) ?: return@mapNotNull null
+                val dx = match.groupValues[1].toFloatOrNull() ?: return@mapNotNull null
+                val dy = match.groupValues[2].toFloatOrNull() ?: return@mapNotNull null
+                val radius = match.groupValues[3].toFloatOrNull() ?: return@mapNotNull null
+                val color = parseCssColorsFromValue(match.groupValues[4]).firstOrNull() ?: return@mapNotNull null
+                m.groupValues[1] to ParsedShadow(color, radius.coerceIn(0f, 8f), dx.coerceIn(-8f, 8f), dy.coerceIn(-8f, 8f))
+            }.toMap()
+
+        private fun parseCssColorsFromValue(value: String): List<Int> {
+            val result = mutableListOf<Int>()
+            Regex("#([0-9a-fA-F]{6})").findAll(value).forEach { result += (0xFF000000L or it.groupValues[1].toLong(16)).toInt() }
+            Regex("rgba?\\(\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})(?:\\s*,\\s*([0-9.]+))?\\s*\\)").findAll(value).forEach { m ->
+                val r = m.groupValues[1].toIntOrNull()?.coerceIn(0, 255) ?: return@forEach
+                val g = m.groupValues[2].toIntOrNull()?.coerceIn(0, 255) ?: return@forEach
+                val b = m.groupValues[3].toIntOrNull()?.coerceIn(0, 255) ?: return@forEach
+                val a = m.groupValues[4].toFloatOrNull()?.let { (it.coerceIn(0f, 1f) * 255).toInt() } ?: 255
+                result += (a shl 24) or (r shl 16) or (g shl 8) or b
+            }
+            return result
         }
     }
 }
