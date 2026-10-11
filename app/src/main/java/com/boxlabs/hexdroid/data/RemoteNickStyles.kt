@@ -38,11 +38,13 @@ data class BfNickRule(
         fontFamily = font,
         fontSize = fontSizeSp?.coerceIn(9f, 24f)?.sp ?: TextUnit.Unspecified,
         fontWeight = fontWeight?.let { FontWeight(it.coerceIn(100, 900)) },
-            fontStyle = if (italic) FontStyle.Italic else FontStyle.Normal,
-            letterSpacing = letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: TextUnit.Unspecified,
-            brush = gradientColors.takeIf { it.size >= 2 }?.let { androidx.compose.ui.graphics.Brush.linearGradient(it.map(androidx.compose.ui.graphics.Color::invoke)) },
-            shadow = shadowColor?.let { androidx.compose.ui.graphics.Shadow(androidx.compose.ui.graphics.Color(it), androidx.compose.ui.geometry.Offset(shadowOffsetXDp, shadowOffsetYDp), shadowRadiusDp) },
-        )
+        fontStyle = if (italic) FontStyle.Italic else FontStyle.Normal,
+        letterSpacing = letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: TextUnit.Unspecified,
+        brush = gradientColors.takeIf { it.size >= 2 }?.let { colors ->
+            androidx.compose.ui.graphics.Brush.linearGradient(colors.map { argb -> ComposeColor(argb) })
+        },
+        shadow = shadowColor?.let { androidx.compose.ui.graphics.Shadow(ComposeColor(it), androidx.compose.ui.geometry.Offset(shadowOffsetXDp, shadowOffsetYDp), shadowRadiusDp) },
+    )
 }
 
 data class RemoteNickStylesSnapshot(

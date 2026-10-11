@@ -1711,6 +1711,9 @@ fun ChatScreen(
             bf?.colorArgb != null -> Color(bf.colorArgb)
             else -> nickColor(base)
         }
+        val gradientBrush = if (colorize) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
+            Brush.linearGradient(colors.map { Color(it) })
+        } else null
         return SpanStyle(
             color = selectedColor,
             fontWeight = if (special?.bold == true) FontWeight.Bold else bf?.fontWeight?.let { FontWeight(it.coerceIn(100, 900)) },
@@ -1718,11 +1721,6 @@ fun ChatScreen(
             fontFamily = bf?.fontFamily?.let { loadedNickFonts[it] },
             fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
             letterSpacing = bf?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
-            brush = if (colorize) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { Brush.linearGradient(it.map { argb -> Color(argb) }) } else null,
-            shadow = bf?.shadowColor?.let { androidx.compose.ui.graphics.Shadow(Color(it), androidx.compose.ui.geometry.Offset(bf.shadowOffsetXDp, bf.shadowOffsetYDp), bf.shadowRadiusDp) },
-            brush = if (colorize) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
-                Brush.linearGradient(colors.map { Color(it) })
-            },
             shadow = bf?.shadowColor?.let { shadowColor ->
                 androidx.compose.ui.graphics.Shadow(
                     color = Color(shadowColor),
@@ -1730,7 +1728,7 @@ fun ChatScreen(
                     blurRadius = bf.shadowRadiusDp,
                 )
             },
-        )
+        ).let { style -> if (gradientBrush != null) style.copy(brush = gradientBrush) else style }
     }
 
     var showNickSheet by remember { mutableStateOf(false) }
@@ -2495,6 +2493,9 @@ fun ChatScreen(
                         } else if (metadataAvatars.isNotEmpty()) {
                             Spacer(Modifier.width(avatarSize + avatarGap))
                         }
+                        val nickGradient = if (state.settings.colorizeNicks) bfNickRule(cleaned)?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
+                            Brush.linearGradient(colors.map { Color(it) })
+                        } else null
                         Text(
                             n,
                             style = MaterialTheme.typography.bodyMedium.copy(
@@ -2507,11 +2508,10 @@ fun ChatScreen(
                                 fontSize = bfNickRule(cleaned)?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: nickFontSp.sp,
                                 lineHeight = (nickFontSp * 1.15f).sp,
                                 letterSpacing = bfNickRule(cleaned)?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
-                                brush = if (state.settings.colorizeNicks) bfNickRule(cleaned)?.gradientColors?.takeIf { it.size >= 2 }?.let { colors -> Brush.linearGradient(colors.map { Color(it) }) } else null,
                                 shadow = bfNickRule(cleaned)?.shadowColor?.let { shadowColor ->
                                     androidx.compose.ui.graphics.Shadow(Color(shadowColor), androidx.compose.ui.geometry.Offset(bfNickRule(cleaned)?.shadowOffsetXDp ?: 0f, bfNickRule(cleaned)?.shadowOffsetYDp ?: 0f), bfNickRule(cleaned)?.shadowRadiusDp ?: 0f)
                                 },
-                            ),
+                            ).let { style -> if (nickGradient != null) style.copy(brush = nickGradient) else style },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             // Fade an away nick a touch further, on top of the row tint.
