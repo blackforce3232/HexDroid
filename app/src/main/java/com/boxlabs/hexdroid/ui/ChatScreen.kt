@@ -267,6 +267,7 @@ import com.boxlabs.hexdroid.R
 import com.boxlabs.hexdroid.UiMessage
 import com.boxlabs.hexdroid.UiSettings
 import com.boxlabs.hexdroid.UiState
+import com.boxlabs.hexdroid.data.NickFontCache
 import com.boxlabs.hexdroid.isAsciiDigit
 import com.boxlabs.hexdroid.isAsciiHexDigit
 import com.boxlabs.hexdroid.parseAnsiRuns
@@ -1268,6 +1269,24 @@ fun ChatScreen(
 
     fun baseNick(display: String): String = display.trimStart { it in nickPrefixChars }
 
+    val nickFontCache = remember { NickFontCache(LocalContext.current.applicationContext) }
+    var loadedNickFonts by remember { mutableStateOf<Map<String, FontFamily>>(emptyMap()) }
+    val activeNickFonts = remember(state.remoteNickStyles.bf.values) {
+        state.remoteNickStyles.bf.values.mapNotNull { it.fontFamily }.distinct()
+    }
+    LaunchedEffect(activeNickFonts) {
+        activeNickFonts.forEach { family ->
+            if (!loadedNickFonts.containsKey(family)) {
+                runCatching { nickFontCache.load(family) }
+                    .getOrNull()
+                    ?.let { loaded -> loadedNickFonts = loadedNickFonts + (family to loaded) }
+            }
+        }
+    }
+
+    fun specialNickRule(nick: String) = state.remoteNickStyles.specialRule(baseNick(nick))
+    fun bfNickRule(nick: String) = state.remoteNickStyles.bfRule(baseNick(nick))
+
     fun nickPrefix(display: String): Char? =
         display.firstOrNull()?.takeIf { it in nickPrefixChars }
 
@@ -1670,11 +1689,29 @@ fun ChatScreen(
         return if (contrast < 2.5f) null else c
     }
 
+    val nickFontCache = remember { NickFontCache(LocalContext.current.applicationContext) }
+    var loadedNickFonts by remember { mutableStateOf<Map<String, FontFamily>>(emptyMap()) }
+    val activeNickFonts = remember(state.remoteNickStyles.bf.values) {
+        state.remoteNickStyles.bf.values.mapNotNull { it.fontFamily }.distinct()
+    }
+    LaunchedEffect(activeNickFonts) {
+        activeNickFonts.forEach { family ->
+            if (!loadedNickFonts.containsKey(family)) {
+                nickFontCache.load(family)?.let { loaded -> loadedNickFonts = loadedNickFonts + (family to loaded) }
+            }
+        }
+    }
+
+    fun specialNickRule(nick: String) = state.remoteNickStyles.specialRule(baseNick(nick))
+    fun bfNickRule(nick: String) = state.remoteNickStyles.bfRule(baseNick(nick))
+
     fun nickColor(nick: String): Color {
         if (!state.settings.colorizeNicks) return Color.Unspecified
         val base = baseNick(nick).lowercase()
         val custom = state.settings.ownNickColorInt
         if (custom != null && base in allMyNicks) return Color(custom)
+        specialNickRule(base)?.let { return Color(it.colorArgb) }
+        bfNickRule(base)?.colorArgb?.let { return Color(it) }
         // A user's self-chosen colour (via metadata) wins over the hash, but never
         // over your own manual override for your own nick, handled above.
         metadataNickColor(base)?.let { return it }
@@ -1682,6 +1719,25 @@ fun ChatScreen(
         // else is in the channel. The nicklist panel uses nicklistColorMap
         // (pre-computed with adjacency nudge) instead.
         return NickColors.colorForNick(base, bgLum)
+    }
+
+    fun nickSpanStyle(nick: String): SpanStyle {
+        val base = baseNick(nick).lowercase()
+        val special = specialNickRule(base)
+        val bf = if (special == null) bfNickRule(base) else null
+        val ownOverride = state.settings.ownNickColorInt?.takeIf { base in allMyNicks }
+        val selectedColor = when {
+            ownOverride != null -> Color(ownOverride)
+            special != null -> Color(special.colorArgb)
+            bf?.colorArgb != null -> Color(bf.colorArgb)
+            else -> nickColor(base)
+        }
+        return SpanStyle(
+            color = selectedColor,
+            fontWeight = if (special?.bold == true) FontWeight.Bold else null,
+            fontFamily = bf?.fontFamily?.let { loadedNickFonts[it] },
+            fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
+        )
     }
 
     var showNickSheet by remember { mutableStateOf(false) }
@@ -2448,12 +2504,16 @@ fun ChatScreen(
                         }
                         Text(
                             n,
-                            color = if (state.settings.colorizeNicks)
-                                metadataNickColor(cleaned.lowercase())
-                                    ?: nicklistColorMap[cleaned.lowercase()]
-                                    ?: NickColors.colorForNick(cleaned.lowercase(), bgLum)
-                            else Color.Unspecified,
-                            fontSize = nickFontSp.sp,
+                            style = nickSpanStyle(cleaned).copy(
+                                color = if (state.settings.colorizeNicks)
+                                    specialNickRule(cleaned)?.let { Color(it.colorArgb) }
+                                        ?: bfNickRule(cleaned)?.colorArgb?.let(::Color)
+                                        ?: metadataNickColor(cleaned.lowercase())
+                                        ?: nicklistColorMap[cleaned.lowercase()]
+                                        ?: NickColors.colorForNick(cleaned.lowercase(), bgLum)
+                                else Color.Unspecified,
+                                fontSize = bfNickRule(cleaned)?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: nickFontSp.sp,
+                            ),
                             lineHeight = (nickFontSp * 1.15f).sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -6862,7 +6922,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(SpanStyle(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
+                        withStyle(nickSpanStyle(fromBase).copy(color = if (colorizeNicks) nickSpanStyle(fromBase).color else Color.Unspecified)) {
                             append(fromDisplay)
                         }
                         pop()
@@ -6890,7 +6950,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(SpanStyle(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
+                        withStyle(nickSpanStyle(fromBase).copy(color = if (colorizeNicks) nickSpanStyle(fromBase).color else Color.Unspecified)) {
                             append(fromDisplay)
                         }
                         pop()

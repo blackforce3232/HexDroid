@@ -40,6 +40,8 @@ import com.boxlabs.hexdroid.connection.ConnectionConstants
 import com.boxlabs.hexdroid.data.AutoJoinChannel
 import com.boxlabs.hexdroid.data.ChannelListEntry
 import com.boxlabs.hexdroid.data.NetworkProfile
+import com.boxlabs.hexdroid.data.RemoteNickStyles
+import com.boxlabs.hexdroid.data.RemoteNickStylesSnapshot
 import com.boxlabs.hexdroid.data.SettingsRepository
 import com.boxlabs.hexdroid.data.ThemeMode
 import kotlinx.collections.immutable.PersistentList
@@ -564,6 +566,8 @@ data class FindOverlay(
 
 data class UiState(
     val connected: Boolean = false,
+    /** Last-known-good Geveze remote nick presentation rules. */
+    val remoteNickStyles: RemoteNickStylesSnapshot = RemoteNickStylesSnapshot(),
     val connecting: Boolean = false,
     val status: String = "Disconnected",
     val myNick: String = "me",
@@ -1691,6 +1695,8 @@ class IrcViewModel(
 
     private val notifier = NotificationHelper(appContext)
     private val logs = LogWriter(appContext)
+    private val remoteNickStyles = RemoteNickStyles(appContext)
+    private var nickStyleRefreshJob: Job? = null
 
     /**
      * Shared E2E keystore. One instance per ViewModel (and therefore per app process),
@@ -2189,6 +2195,20 @@ class IrcViewModel(
     private val gracefulQuitHook: (onDone: () -> Unit) -> Boolean = ::onTaskRemovedGracefulQuit
 
     init {
+        _state.update { it.copy(remoteNickStyles = remoteNickStyles.snapshot()) }
+        viewModelScope.launch {
+            runCatching { remoteNickStyles.refreshIfStale() }
+                .onSuccess { snapshot -> _state.update { it.copy(remoteNickStyles = snapshot) } }
+        }
+        nickStyleRefreshJob = viewModelScope.launch {
+            while (isActive) {
+                if (AppVisibility.isForeground || _state.value.connections.values.any { it.connected }) {
+                    runCatching { remoteNickStyles.refresh() }
+                        .onSuccess { snapshot -> _state.update { it.copy(remoteNickStyles = snapshot) } }
+                }
+                delay(15 * 60 * 1000L)
+            }
+        }
         // Let KeepAliveService request a clean QUIT if the user swipes the app away while
         // background persistence is off (see onTaskRemovedGracefulQuit). Cleared in onCleared.
         KeepAliveService.gracefulQuitOnSwipe = gracefulQuitHook
@@ -5525,6 +5545,10 @@ fun startAddNetwork() {
                 reconnectAttempts.remove(netId)
                 setNetConn(netId) {
                     it.copy(connected = false, connecting = false, status = statusText, lagMs = null)
+                }
+                viewModelScope.launch {
+                    runCatching { remoteNickStyles.refresh() }
+                        .onSuccess { snapshot -> _state.update { it.copy(remoteNickStyles = snapshot) } }
                 }
                 if (_state.value.activeNetworkId == netId) updateConnectionNotification(statusText)
                     if (_state.value.settings.autoReconnectEnabled && desiredConnected.contains(netId)) {
@@ -13465,6 +13489,7 @@ private fun moveNickAcrossChannels(netId: String, oldNick: String, newNick: Stri
 
     override fun onCleared() {
         super.onCleared()
+        nickStyleRefreshJob?.cancel()
         flushHeldOwnLines()
         val cm = appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
         networkCallback?.let { cb -> runCatching { cm?.unregisterNetworkCallback(cb) } }
