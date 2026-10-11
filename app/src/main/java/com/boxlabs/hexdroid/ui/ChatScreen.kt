@@ -1269,24 +1269,6 @@ fun ChatScreen(
 
     fun baseNick(display: String): String = display.trimStart { it in nickPrefixChars }
 
-    val nickFontCache = remember { NickFontCache(LocalContext.current.applicationContext) }
-    var loadedNickFonts by remember { mutableStateOf<Map<String, FontFamily>>(emptyMap()) }
-    val activeNickFonts = remember(state.remoteNickStyles.bf.values) {
-        state.remoteNickStyles.bf.values.mapNotNull { it.fontFamily }.distinct()
-    }
-    LaunchedEffect(activeNickFonts) {
-        activeNickFonts.forEach { family ->
-            if (!loadedNickFonts.containsKey(family)) {
-                runCatching { nickFontCache.load(family) }
-                    .getOrNull()
-                    ?.let { loaded -> loadedNickFonts = loadedNickFonts + (family to loaded) }
-            }
-        }
-    }
-
-    fun specialNickRule(nick: String) = state.remoteNickStyles.specialRule(baseNick(nick))
-    fun bfNickRule(nick: String) = state.remoteNickStyles.bfRule(baseNick(nick))
-
     fun nickPrefix(display: String): Char? =
         display.firstOrNull()?.takeIf { it in nickPrefixChars }
 
@@ -1689,19 +1671,15 @@ fun ChatScreen(
         return if (contrast < 2.5f) null else c
     }
 
-    val nickFontCache = remember { NickFontCache(LocalContext.current.applicationContext) }
+    val appContext = LocalContext.current.applicationContext
+    val nickFontCache = remember(appContext) { NickFontCache(appContext) }
     var loadedNickFonts by remember { mutableStateOf<Map<String, FontFamily>>(emptyMap()) }
-    val activeNickFonts = remember(state.remoteNickStyles.bf.values) {
-        state.remoteNickStyles.bf.values.mapNotNull { it.fontFamily }.distinct()
-    }
+    val activeNickFonts = state.remoteNickStyles.bf.values.mapNotNull { it.fontFamily }.distinct()
     LaunchedEffect(activeNickFonts) {
         activeNickFonts.forEach { family ->
-            if (!loadedNickFonts.containsKey(family)) {
-                nickFontCache.load(family)?.let { loaded -> loadedNickFonts = loadedNickFonts + (family to loaded) }
-            }
+            if (!loadedNickFonts.containsKey(family)) runCatching { nickFontCache.load(family) }.getOrNull()?.let { font -> loadedNickFonts = loadedNickFonts + (family to font) }
         }
     }
-
     fun specialNickRule(nick: String) = state.remoteNickStyles.specialRule(baseNick(nick))
     fun bfNickRule(nick: String) = state.remoteNickStyles.bfRule(baseNick(nick))
 
@@ -1725,15 +1703,9 @@ fun ChatScreen(
         val base = baseNick(nick).lowercase()
         val special = specialNickRule(base)
         val bf = if (special == null) bfNickRule(base) else null
-        val ownOverride = state.settings.ownNickColorInt?.takeIf { base in allMyNicks }
-        val selectedColor = when {
-            ownOverride != null -> Color(ownOverride)
-            special != null -> Color(special.colorArgb)
-            bf?.colorArgb != null -> Color(bf.colorArgb)
-            else -> nickColor(base)
-        }
+        val own = state.settings.ownNickColorInt?.takeIf { base in allMyNicks }
         return SpanStyle(
-            color = selectedColor,
+            color = own?.let(::Color) ?: special?.let { Color(it.colorArgb) } ?: bf?.colorArgb?.let(::Color) ?: nickColor(base),
             fontWeight = if (special?.bold == true) FontWeight.Bold else null,
             fontFamily = bf?.fontFamily?.let { loadedNickFonts[it] },
             fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
@@ -2504,16 +2476,12 @@ fun ChatScreen(
                         }
                         Text(
                             n,
-                            style = nickSpanStyle(cleaned).copy(
-                                color = if (state.settings.colorizeNicks)
-                                    specialNickRule(cleaned)?.let { Color(it.colorArgb) }
-                                        ?: bfNickRule(cleaned)?.colorArgb?.let(::Color)
-                                        ?: metadataNickColor(cleaned.lowercase())
-                                        ?: nicklistColorMap[cleaned.lowercase()]
-                                        ?: NickColors.colorForNick(cleaned.lowercase(), bgLum)
-                                else Color.Unspecified,
-                                fontSize = bfNickRule(cleaned)?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: nickFontSp.sp,
-                            ),
+                            color = if (state.settings.colorizeNicks)
+                                nickColor(cleaned)
+                            else Color.Unspecified,
+                            fontWeight = if (specialNickRule(cleaned)?.bold == true) FontWeight.Bold else FontWeight.Normal,
+                            fontFamily = bfNickRule(cleaned)?.fontFamily?.let { loadedNickFonts[it] },
+                            fontSize = nickFontSp.sp,
                             lineHeight = (nickFontSp * 1.15f).sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -6922,7 +6890,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(nickSpanStyle(fromBase).copy(color = if (colorizeNicks) nickSpanStyle(fromBase).color else Color.Unspecified)) {
+                        withStyle(nickSpanStyle(fromBase).copy(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
                             append(fromDisplay)
                         }
                         pop()
@@ -6950,7 +6918,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(nickSpanStyle(fromBase).copy(color = if (colorizeNicks) nickSpanStyle(fromBase).color else Color.Unspecified)) {
+                        withStyle(nickSpanStyle(fromBase).copy(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
                             append(fromDisplay)
                         }
                         pop()
