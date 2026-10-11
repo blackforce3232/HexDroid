@@ -168,7 +168,7 @@ class RemoteNickStyles(private val context: Context) {
     }
 }
 
-/** Downloads Google Fonts CSS only for active rules, then caches validated WOFF2 files locally. */
+/** Downloads Google Fonts CSS for active rules, then persistently caches validated font files. */
 class NickFontCache(private val context: Context) {
     private val dir = File(context.filesDir, "nick_fonts").apply { mkdirs() }
     private val client = OkHttpClient.Builder().connectTimeout(8, TimeUnit.SECONDS).readTimeout(12, TimeUnit.SECONDS).callTimeout(15, TimeUnit.SECONDS).build()
@@ -178,23 +178,36 @@ class NickFontCache(private val context: Context) {
         withContext(Dispatchers.IO) {
             val safeFamily = family.takeIf { it.matches(Regex("[A-Za-z0-9 ]{1,60}")) } ?: return@withContext null
             val key = safeFamily.lowercase().hashCode().toUInt().toString(16)
-            val fontFile = File(dir, "$key.woff2")
-            if (!fontFile.exists()) {
-                val cssUrl = "https://fonts.googleapis.com/css2?family=${java.net.URLEncoder.encode(safeFamily, "UTF-8").replace("+", "+")}&display=swap"
+            val fontFile = listOf("woff2", "woff", "ttf").map { File(dir, "$key.$it") }.firstOrNull { it.exists() }
+            val cachedFont = fontFile
+            if (cachedFont == null) {
+                val cssUrl = "https://fonts.googleapis.com/css?family=${java.net.URLEncoder.encode(safeFamily, "UTF-8") }"
                 val css = getAllowlisted(cssUrl, "fonts.googleapis.com", 256 * 1024) ?: return@withContext null
-                val fontUrl = Regex("url\\((https://fonts\\.gstatic\\.com/[^)]+\\.woff2)\\)").find(css)?.groupValues?.get(1) ?: return@withContext null
-                val bytes = getAllowlisted(fontUrl, "fonts.gstatic.com", MAX_FONT_BYTES)?.toByteArray(Charsets.ISO_8859_1) ?: return@withContext null
-                if (bytes.size < 12 || !bytes.copyOfRange(0, 4).contentEquals("wOF2".toByteArray())) return@withContext null
-                val tmp = File(dir, "$key.tmp"); tmp.writeBytes(bytes); tmp.renameTo(fontFile)
+                // Android Typeface.Builder accepts TrueType/OpenType files, not CSS webfont
+                // containers (WOFF/WOFF2). Use the Google Fonts legacy CSS endpoint with a
+                // browser UA that makes it return a TTF source, then cache that TTF.
+                val fontMatch = Regex("url\\((https://fonts\\.gstatic\\.com/[^)]+\\.(?:ttf|otf|woff2|woff))\\)").findAll(css).lastOrNull() ?: return@withContext null
+                val fontUrl = fontMatch.groupValues[1]
+                val ext = fontUrl.substringAfterLast('.').lowercase()
+                val encoded = getAllowlisted(fontUrl, "fonts.gstatic.com", MAX_FONT_BYTES) ?: return@withContext null
+                val bytes = encoded.toByteArray(Charsets.ISO_8859_1)
+                if (bytes.size < 12) return@withContext null
+                if (ext == "woff2" || ext == "woff") return@withContext null
+                if (ext == "ttf" && !bytes.copyOfRange(0, 4).contentEquals(byteArrayOf(0, 1, 0, 0))) return@withContext null
+                val downloaded = File(dir, "$key.$ext")
+                val tmp = File(dir, "$key.tmp"); tmp.writeBytes(bytes)
+                if (!tmp.renameTo(downloaded)) { tmp.delete(); return@withContext null }
+                return@withContext runCatching { FontFamily(Typeface.Builder(downloaded).build()) }.getOrNull()
             }
-            val tf = runCatching { Typeface.Builder(fontFile).build() }.getOrNull() ?: return@withContext null
-            FontFamily(tf)
+            runCatching { FontFamily(Typeface.Builder(cachedFont!!).build()) }.getOrNull()
         }
     }
 
     private fun getAllowlisted(url: String, host: String, max: Int): String? = runCatching {
         val uri = URI(url); require(uri.scheme == "https" && uri.host == host && uri.userInfo == null)
-        val req = Request.Builder().url(url).build()
+        val req = Request.Builder().url(url).apply {
+            if (host == "fonts.googleapis.com") header("User-Agent", "Mozilla/5.0")
+        }.build()
         client.newCall(req).execute().use { r ->
             if (!r.isSuccessful || r.body.contentLength() > max) return null
             val bytes = r.body.bytes(); if (bytes.size > max) return null
