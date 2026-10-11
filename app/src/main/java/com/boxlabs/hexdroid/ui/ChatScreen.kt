@@ -1699,13 +1699,20 @@ fun ChatScreen(
         return NickColors.colorForNick(base, bgLum)
     }
 
-    fun nickSpanStyle(nick: String): SpanStyle {
+    fun nickStyleForMessage(nick: String, colorize: Boolean): SpanStyle {
         val base = baseNick(nick).lowercase()
         val special = specialNickRule(base)
         val bf = if (special == null) bfNickRule(base) else null
         val own = state.settings.ownNickColorInt?.takeIf { base in allMyNicks }
+        val selectedColor = when {
+            !colorize -> Color.Unspecified
+            own != null -> Color(own)
+            special != null -> Color(special.colorArgb)
+            bf?.colorArgb != null -> Color(bf.colorArgb)
+            else -> nickColor(base)
+        }
         return SpanStyle(
-            color = own?.let(::Color) ?: special?.let { Color(it.colorArgb) } ?: bf?.colorArgb?.let(::Color) ?: nickColor(base),
+            color = selectedColor,
             fontWeight = if (special?.bold == true) FontWeight.Bold else null,
             fontFamily = bf?.fontFamily?.let { loadedNickFonts[it] },
             fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
@@ -6890,7 +6897,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(nickSpanStyle(fromBase).copy(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
+                        withStyle(nickStyleForMessage(fromBase, colorizeNicks)) {
                             append(fromDisplay)
                         }
                         pop()
@@ -6918,7 +6925,7 @@ private fun SingleMessageItem(
                         // Bot Mode: a robot icon marks messages from bots.
                         if (m.fromBot) { appendInlineContent(BOT_INLINE_ID, botPrefix); }
                         pushStringAnnotation(tag = ANN_NICK, annotation = fromBase)
-                        withStyle(nickSpanStyle(fromBase).copy(color = if (colorizeNicks) nickColor(fromBase) else Color.Unspecified)) {
+                        withStyle(nickStyleForMessage(fromBase, colorizeNicks)) {
                             append(fromDisplay)
                         }
                         pop()
