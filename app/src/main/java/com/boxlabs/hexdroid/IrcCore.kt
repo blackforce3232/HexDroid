@@ -2629,6 +2629,7 @@ class IrcClient(val config: IrcConfig) {
         serverTimeMs: Long?,
         playbackHistory: Boolean,
         nowMs: Long,
+        ingressElapsedMs: Long,
     ) {
 				when (msg.command.uppercase(Locale.ROOT)) {
 					"NICK" -> {
@@ -2943,7 +2944,7 @@ class IrcClient(val config: IrcConfig) {
 								isPrivate = isPrivate,
 												isAction = isAction,
 												timeMs = serverTimeMs,
-											ingressElapsedMs = ingressElapsedMs,
+												ingressElapsedMs = ingressElapsedMs,
 												isHistory = (playbackHistory || isHeuristicHistory(buf, serverTimeMs, nowMs)),
 								isChathistoryContext = msg.tags.containsKey("draft/chathistory-context"),
 								msgId = msg.tags["msgid"],
@@ -6336,7 +6337,7 @@ val numericHandlers: Map<String, suspend (IrcMessage, Long?, Boolean, Long) -> U
 					}
 				}
 
-				handleMessageCommand(msg, irc, serverTimeMs, playbackHistory, nowMs)
+				handleMessageCommand(msg, irc, serverTimeMs, playbackHistory, nowMs, ingressElapsedMs)
 				} catch (e: kotlinx.coroutines.CancellationException) {
 					throw e
 				} catch (e: kotlinx.coroutines.channels.ClosedSendChannelException) {
