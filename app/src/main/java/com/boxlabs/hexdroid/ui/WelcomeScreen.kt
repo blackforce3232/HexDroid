@@ -123,25 +123,24 @@ fun WelcomeScreen(
             .systemBarsPadding()
             .imePadding()
     ) {
-        // The artwork stays deliberately subtle so the white default theme remains readable.
-        // A single scaled bitmap plus two translucent gradients is inexpensive compared with
-        // blur/shader effects and also keeps text fields legible on small screens.
+        // Keep the artwork visible in the white theme. A single scaled bitmap plus one
+        // translucent gradient is inexpensive compared with blur/shader effects.
         Image(
             painter = painterResource(R.drawable.giris_arkaplan),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
-                .alpha(0.16f),
+                .alpha(0.52f),
         )
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        0f to MaterialTheme.colorScheme.background.copy(alpha = 0.82f),
-                        0.55f to MaterialTheme.colorScheme.background.copy(alpha = 0.93f),
-                        1f to MaterialTheme.colorScheme.background.copy(alpha = 0.98f),
+                        0f to MaterialTheme.colorScheme.background.copy(alpha = 0.34f),
+                        0.55f to MaterialTheme.colorScheme.background.copy(alpha = 0.58f),
+                        1f to MaterialTheme.colorScheme.background.copy(alpha = 0.78f),
                     )
                 )
         )

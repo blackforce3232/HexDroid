@@ -3106,17 +3106,40 @@ fun ChatScreen(
                     // Private-message list. This is separate from the channel switcher so PMs
                     // remain easy to reach without mixing them into the channel tabs.
                     Box {
-                        BarIconButton(
-                            size = accentBtnSize,
-                            onClick = { showPrivateMessagesSheet = true },
-                            initialFocus = false,
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Chat,
-                                contentDescription = stringResource(R.string.chat_private_messages_open),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(accentGlyphSize),
-                            )
+                        val totalPrivateUnread = state.buffers.entries.sumOf { (key, buffer) ->
+                            val (bufferNet, name) = splitKey(key)
+                            if (bufferNet == selNetId && name != "*server*" &&
+                                !name.startsWith("DCCCHAT:") &&
+                                name.firstOrNull()?.let {
+                                    it in (state.connections[bufferNet]?.chanTypes ?: "#&!+")
+                                } != true
+                            ) buffer.unread else 0
+                        }
+                        Box(modifier = Modifier.size(accentBtnSize)) {
+                            BarIconButton(
+                                size = accentBtnSize,
+                                onClick = { showPrivateMessagesSheet = true },
+                                initialFocus = false,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Chat,
+                                    contentDescription = stringResource(R.string.chat_private_messages_open),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(accentGlyphSize),
+                                )
+                            }
+                            if (totalPrivateUnread > 0) {
+                                Badge(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .offset(x = 5.dp, y = (-4).dp),
+                                ) {
+                                    Text(
+                                        text = totalPrivateUnread.coerceAtMost(99).toString(),
+                                        style = MaterialTheme.typography.labelSmall,
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -3150,16 +3173,16 @@ fun ChatScreen(
                             contentWindowInsets = { WindowInsets(0) },
                         ) {
                             val pmBuffers = state.buffers.entries
-                                .filter { (key, buffer) ->
+                                .filter { (key, _) ->
                                     val (bufferNet, name) = splitKey(key)
-                                    name != "*server*" && !name.startsWith("DCCCHAT:") &&
+                                    bufferNet == selNetId && name != "*server*" &&
+                                        !name.startsWith("DCCCHAT:") &&
                                         name.firstOrNull()?.let {
                                             it in (state.connections[bufferNet]?.chanTypes ?: "#&!+")
                                         } != true
                                 }
-                                .sortedBy { it.value.name.lowercase(Locale.ROOT) }
+                                .sortedBy { splitKey(it.key).second.lowercase(Locale.ROOT) }
                             val netId = selNetId
-                            val conn = state.connections[netId]
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -3185,7 +3208,9 @@ fun ChatScreen(
                                     Text(stringResource(R.string.chat_private_messages_empty), style = MaterialTheme.typography.bodyMedium)
                                 } else {
                                     pmBuffers.forEach { (key, buffer) ->
-                                        val nick = buffer.name
+                                        // UiBuffer.name stores the full stable key (network::nick).
+                                        // Render only the remote nick in this single-network list.
+                                        val nick = splitKey(key).second
                                         val nickKey = baseNick(nick).lowercase(Locale.ROOT)
                                         val legacyAvatar = state.remoteNickStyles.profileImageUrl(nick)
                                         val avatar = metadataAvatars[nickKey] ?: legacyAvatar
@@ -3205,8 +3230,7 @@ fun ChatScreen(
                                         ListItem(
                                             headlineContent = { Text(nick, style = nickStyle) },
                                             supportingContent = {
-                                                val count = buffer.unread + buffer.highlights
-                                                if (count > 0) Text(count.toString())
+                                                if (buffer.unread > 0) Text(buffer.unread.toString())
                                             },
                                             leadingContent = {
                                                 if (avatar != null) {
