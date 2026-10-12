@@ -464,6 +464,7 @@
     <string name="chat_private_messages_enable">Enable private messages</string>
     <string name="chat_private_messages_pending">Updating private-message mode…</string>
     <string name="chat_private_messages_empty">No private message conversations</string>
+    <string name="chat_close_all_private_messages">Close all private message windows</string>
     <string name="chat_drag_reorder">Drag to reorder</string>
     <string name="chat_clear_all">Clear all</string>
 

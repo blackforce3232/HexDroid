@@ -462,6 +462,7 @@
     <string name="chat_private_messages_enable">Özel Mesajları Aç</string>
     <string name="chat_private_messages_pending">Özel mesaj modu güncelleniyor…</string>
     <string name="chat_private_messages_empty">Açık özel mesaj konuşması yok</string>
+    <string name="chat_close_all_private_messages">Bütün özel pencereleri kapat</string>
     <string name="chat_drag_reorder">Yeniden sıralamak için sürükle</string>
     <string name="chat_clear_all">Tümünü temizle</string>
 

@@ -796,26 +796,6 @@ class SettingsRepository(private val ctx: Context) {
             autoJoin = listOf(AutoJoinChannel("#Geveze", null)),
             autoConnect = true,
         ),
-        NetworkProfile(
-            id = "TRSohbet",
-            name = "TRSohbet",
-            host = "irc.trsohbet.com",
-            port = 6667,
-            useTls = false,
-            allowInvalidCerts = false,
-            serverPassword = null,
-            nick = "GevezeUser",
-            altNick = "GevezeUser_",
-            username = "geveze",
-            realname = "Geveze IRC",
-            saslEnabled = false,
-            saslMechanism = SaslMechanism.PLAIN,
-            saslAuthcid = null,
-            saslPassword = null,
-            caps = CapPrefs(),
-            autoJoin = emptyList(),
-            autoConnect = false,
-        )
     )
 
     private fun parseAutoJoinLine(line: String): AutoJoinChannel? {

@@ -1176,6 +1176,7 @@ fun ChatScreen(
     onToggleBufferList: () -> Unit,
     onToggleNickList: () -> Unit,
     onTogglePrivateMessages: (String) -> Unit = {},
+    onCloseAllPrivateMessages: (String) -> Unit = {},
     onToggleChannelsOnly: () -> Unit,
     onWhois: (String) -> Unit,
     onIgnoreNick: (String, String) -> Unit,
@@ -3119,6 +3120,30 @@ fun ChatScreen(
                         }
                     }
 
+                    // Private-message reception toggle. The server-confirmed +D/-D state is
+                    // reflected here; the action remains disabled until that state is known.
+                    run {
+                        val pmConn = state.connections[selNetId]
+                        val pmDisabled = pmConn?.privateMessagesDisabled
+                        val pmPending = pmConn?.privateMessagesModePending == true
+                        BarIconButton(
+                            size = accentBtnSize,
+                            onClick = { onTogglePrivateMessages(selNetId) },
+                            enabled = pmConn?.connected == true && pmDisabled != null && !pmPending,
+                            initialFocus = false,
+                        ) {
+                            Icon(
+                                imageVector = if (pmDisabled == true) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                contentDescription = stringResource(
+                                    if (pmDisabled == true) R.string.chat_private_messages_enable
+                                    else R.string.chat_private_messages_close
+                                ),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(accentGlyphSize),
+                            )
+                        }
+                    }
+
                     if (showPrivateMessagesSheet) {
                         ModalBottomSheet(
                             onDismissRequest = { showPrivateMessagesSheet = false },
@@ -3143,42 +3168,65 @@ fun ChatScreen(
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 Text(stringResource(R.string.chat_private_messages), style = MaterialTheme.typography.titleMedium)
-                                if (conn != null) {
-                                    val disabled = conn.privateMessagesDisabled
-                                    val pending = conn.privateMessagesModePending
-                                    ListItem(
-                                        headlineContent = {
-                                            Text(
-                                                when {
-                                                    pending -> stringResource(R.string.chat_private_messages_pending)
-                                                    disabled == true -> stringResource(R.string.chat_private_messages_enable)
-                                                    else -> stringResource(R.string.chat_private_messages_close)
-                                                }
-                                            )
-                                        },
-                                        leadingContent = {
-                                            Icon(
-                                                if (disabled == true) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                                contentDescription = null,
-                                            )
-                                        },
-                                        modifier = Modifier.clickable(
-                                            enabled = conn.connected && !pending && disabled != null,
-                                        ) {
-                                            onTogglePrivateMessages(netId)
-                                        },
-                                    )
-                                    HorizontalDivider()
-                                }
+                                ListItem(
+                                    headlineContent = {
+                                        Text(stringResource(R.string.chat_close_all_private_messages))
+                                    },
+                                    leadingContent = {
+                                        Icon(Icons.Filled.Close, contentDescription = null)
+                                    },
+                                    modifier = Modifier.clickable {
+                                        onCloseAllPrivateMessages(netId)
+                                        showPrivateMessagesSheet = false
+                                    },
+                                )
+                                HorizontalDivider()
                                 if (pmBuffers.isEmpty()) {
                                     Text(stringResource(R.string.chat_private_messages_empty), style = MaterialTheme.typography.bodyMedium)
                                 } else {
                                     pmBuffers.forEach { (key, buffer) ->
+                                        val nick = buffer.name
+                                        val nickKey = baseNick(nick).lowercase(Locale.ROOT)
+                                        val legacyAvatar = state.remoteNickStyles.profileImageUrl(nick)
+                                        val avatar = metadataAvatars[nickKey] ?: legacyAvatar
+                                        val bf = bfNickRule(nick)
+                                        val special = specialNickRule(nick)
+                                        val nickColor = metadataNickColor(nickKey)
+                                            ?: bf?.colorArgb?.let(::Color)
+                                        val nickFont = bf?.fontFamily?.let { loadedNickFonts[it] }
+                                        val nickStyle = MaterialTheme.typography.bodyLarge.copy(
+                                            color = nickColor ?: MaterialTheme.colorScheme.onSurface,
+                                            fontFamily = nickFont,
+                                            fontWeight = if (bf != null || special?.bold == true) FontWeight.Bold else FontWeight.Normal,
+                                            fontStyle = if (bf?.italic == true) FontStyle.Italic else FontStyle.Normal,
+                                            fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp
+                                                ?: MaterialTheme.typography.bodyLarge.fontSize,
+                                        )
                                         ListItem(
-                                            headlineContent = { Text(buffer.name) },
+                                            headlineContent = { Text(nick, style = nickStyle) },
                                             supportingContent = {
                                                 val count = buffer.unread + buffer.highlights
                                                 if (count > 0) Text(count.toString())
+                                            },
+                                            leadingContent = {
+                                                if (avatar != null) {
+                                                    var avatarBmp by remember(avatar) { mutableStateOf(RemoteImage.cached(avatar)) }
+                                                    LaunchedEffect(avatar) {
+                                                        if (avatarBmp == null) avatarBmp = RemoteImage.fetch(avatar)
+                                                    }
+                                                    if (avatarBmp != null) {
+                                                        Image(
+                                                            bitmap = avatarBmp!!,
+                                                            contentDescription = null,
+                                                            contentScale = ContentScale.Crop,
+                                                            modifier = Modifier.size(40.dp).clip(CircleShape),
+                                                        )
+                                                    } else {
+                                                        Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null)
+                                                    }
+                                                } else {
+                                                    Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null)
+                                                }
                                             },
                                             modifier = Modifier.clickable {
                                                 showPrivateMessagesSheet = false

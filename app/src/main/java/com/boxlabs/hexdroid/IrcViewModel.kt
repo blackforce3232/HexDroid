@@ -2989,6 +2989,18 @@ class IrcViewModel(
         }
     }
 
+    /** Close every currently open private-message buffer on the single active network. */
+    fun closeAllPrivateMessages(netId: String) {
+        val st = _state.value
+        val conn = st.connections[netId] ?: return
+        val keys = st.buffers.keys.filter { key ->
+            val (keyNet, name) = splitKey(key)
+            keyNet == netId && name != "*server*" && !isPseudoBuffer(name) &&
+                !isDccChatBufferName(name) && !isChannelOnNet(netId, name)
+        }
+        keys.forEach(::removeBuffer)
+    }
+
 	/**
 	 * Re-query the selected channel's modes so the ops drawer shows live server state.
 	 * Marked silent first: this is a UI refresh, not something the user asked to see, so
@@ -3328,6 +3340,8 @@ class IrcViewModel(
     }
 
 fun startAddNetwork() {
+	// Temporarily keep the application single-network.
+	if (_state.value.networks.isNotEmpty()) return
 	val n = NetworkProfile(
 		// Use UUID instead of currentTimeMillis() to avoid ID collisions when two
 		// networks are created within the same millisecond (e.g. from a backup restore).
@@ -3715,6 +3729,8 @@ fun startAddNetwork() {
     }
 
     fun deleteNetwork(id: String) {
+        // The built-in Geveze profile is the application's required base network.
+        if (id == "Geveze") return
         viewModelScope.launch {
             repo.deleteNetwork(id)
             repo.secretStore.clearSaslPassword(id)

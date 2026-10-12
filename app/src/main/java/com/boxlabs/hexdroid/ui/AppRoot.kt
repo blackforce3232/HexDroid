@@ -288,6 +288,7 @@ fun AppRoot(
                     onToggleBufferList = vm::toggleBufferList,
                     onToggleNickList = vm::toggleNickList,
                     onTogglePrivateMessages = vm::togglePrivateMessages,
+                    onCloseAllPrivateMessages = vm::closeAllPrivateMessages,
                     onToggleChannelsOnly = vm::toggleChannelsOnly,
                     onWhois = vm::whois,
                     onIgnoreNick = vm::ignoreNick,

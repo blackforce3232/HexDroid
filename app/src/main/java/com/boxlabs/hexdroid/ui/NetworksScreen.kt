@@ -498,14 +498,16 @@ private fun NetworkDetailPane(
 
         HorizontalDivider()
 
-        OutlinedButton(
-            onClick = { onDelete(profile.id); onActionTaken() },
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-            modifier = Modifier.fillMaxWidth().focusHighlight(RoundedCornerShape(50)),
-        ) {
-            Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.delete))
+        if (profile.id != "Geveze") {
+            OutlinedButton(
+                onClick = { onDelete(profile.id); onActionTaken() },
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                modifier = Modifier.fillMaxWidth().focusHighlight(RoundedCornerShape(50)),
+            ) {
+                Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.delete))
+            }
         }
 
         Spacer(Modifier.height(24.dp))
@@ -628,20 +630,22 @@ fun NetworksScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAdd,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .tourTarget(TourTarget.NETWORKS_ADD_FAB)
-                    .focusHighlight(RoundedCornerShape(16.dp))
-                    .then(if (sortedNetworks.isEmpty()) Modifier.tvInitialFocus() else Modifier)
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.networks_add),
-                    modifier = Modifier.size(28.dp)
-                )
+            if (sortedNetworks.isEmpty()) {
+                FloatingActionButton(
+                    onClick = onAdd,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .tourTarget(TourTarget.NETWORKS_ADD_FAB)
+                        .focusHighlight(RoundedCornerShape(16.dp))
+                        .tvInitialFocus()
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.networks_add),
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -698,7 +702,7 @@ fun NetworksScreen(
                     }
                 }
 
-                if (railLayout && sortedNetworks.isNotEmpty()) {
+                if (railLayout && sortedNetworks.isEmpty()) {
                     // A remote can reach the FAB, but a labelled button at the top of
                     // the list is the first thing a D-pad lands on.
                     OutlinedButton(
