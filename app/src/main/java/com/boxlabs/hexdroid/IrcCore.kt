@@ -19,6 +19,8 @@
 package com.boxlabs.hexdroid
 
 import android.annotation.SuppressLint
+import android.os.SystemClock
+import android.os.SystemClock
 import com.boxlabs.hexdroid.connection.ConnectionConstants
 import com.boxlabs.hexdroid.connection.SocksProxy
 import com.boxlabs.hexdroid.data.AutoJoinChannel
@@ -619,6 +621,8 @@ sealed class IrcEvent {
          */
         val multiline: Boolean = false,
         val timeMs: Long? = null,
+        /** Monotonic timestamp captured immediately after the socket line was read; diagnostics only. */
+        val ingressElapsedMs: Long = 0L,
         val isHistory: Boolean = false,
         /**
          * draft/chathistory-context: a related message the server volunteered alongside the
@@ -2937,9 +2941,10 @@ class IrcClient(val config: IrcConfig) {
 								target = buf,
 								text = text,
 								isPrivate = isPrivate,
-								isAction = isAction,
-								timeMs = serverTimeMs,
-								isHistory = (playbackHistory || isHeuristicHistory(buf, serverTimeMs, nowMs)),
+												isAction = isAction,
+												timeMs = serverTimeMs,
+											ingressElapsedMs = ingressElapsedMs,
+												isHistory = (playbackHistory || isHeuristicHistory(buf, serverTimeMs, nowMs)),
 								isChathistoryContext = msg.tags.containsKey("draft/chathistory-context"),
 								msgId = msg.tags["msgid"],
 								// IRCv3 +draft/reply / +reply tag: msgid of message being replied to.
@@ -5877,6 +5882,7 @@ val numericHandlers: Map<String, suspend (IrcMessage, Long?, Boolean, Long) -> U
 			while (true) {
 				val prevEncoding = lineReader.encoding
 				val line = withContext(Dispatchers.IO) { lineReader.readLine() } ?: break
+				val ingressElapsedMs = SystemClock.elapsedRealtime()
 
 				// Raw log, incoming. Before parsing, so a line we fail to parse is still visible.
 				if (rawLogEnabled && line.isNotEmpty()) send(IrcEvent.RawLine(false, redactRawLine(line)))

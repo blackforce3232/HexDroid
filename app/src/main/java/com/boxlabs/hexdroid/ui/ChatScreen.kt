@@ -6309,9 +6309,35 @@ fun ChatScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val sheetBase = selectedNick.lowercase()
-                    val sheetAvatar = metadataAvatars[sheetBase] ?: state.remoteNickStyles.profileImageUrl(selectedNick)
+                    val sheetBase = baseNick(selectedNick).lowercase()
+                    val sheetAvatar = metadataAvatars[sheetBase] ?: state.remoteNickStyles.profileImageUrl(selectedNick, 45)
                     val sheetRole = nickRole(nickDisplayByBase[sheetBase] ?: selectedNick)
+                    val sheetSpecial = specialNickRule(selectedNick)
+                    val sheetBf = bfNickRule(selectedNick)
+                    val sheetNickColor = sheetBf?.colorArgb?.let(::Color)
+                        ?: if (sheetSpecial?.bold == true) Color(0xFF151414) else null
+                    val sheetNickStyle = MaterialTheme.typography.titleLarge.copy(
+                        color = sheetNickColor ?: MaterialTheme.colorScheme.onSurface,
+                        fontWeight = sheetBf?.fontWeight?.let { FontWeight(it.coerceIn(100, 900)) }
+                            ?: if (sheetSpecial?.bold == true) FontWeight.Black else FontWeight.Normal,
+                        fontStyle = if (sheetBf?.italic == true) FontStyle.Italic else FontStyle.Normal,
+                        fontFamily = sheetBf?.fontFamily?.let { loadedNickFonts[it] },
+                        fontSize = sheetBf?.fontSizeSp?.coerceIn(9f, 24f)?.sp
+                            ?: MaterialTheme.typography.titleLarge.fontSize,
+                        letterSpacing = sheetBf?.letterSpacingSp?.coerceIn(0f, 4f)?.sp
+                            ?: MaterialTheme.typography.titleLarge.letterSpacing,
+                        shadow = sheetBf?.shadowColor?.let {
+                            androidx.compose.ui.graphics.Shadow(
+                                Color(it),
+                                androidx.compose.ui.geometry.Offset(sheetBf.shadowOffsetXDp, sheetBf.shadowOffsetYDp),
+                                sheetBf.shadowRadiusDp,
+                            )
+                        },
+                    ).let { style ->
+                        val gradient = sheetBf?.gradientColors?.takeIf { it.size >= 2 }
+                            ?.let { Brush.linearGradient(it.map(::Color)) }
+                        if (gradient != null) style.copy(brush = gradient) else style
+                    }
                     val sheetDisplayName = metadataDisplayNames[sheetBase]
                         ?.takeIf { !it.equals(selectedNick, ignoreCase = true) }
                     val sheetStatus = metadataStatuses[sheetBase]
@@ -6354,7 +6380,7 @@ fun ChatScreen(
                             )
                         }
                         Column {
-                            Text(selectedNick, style = MaterialTheme.typography.titleLarge)
+                            Text(selectedNick, style = sheetNickStyle)
                             Text(
                                 sheetRole.label,
                                 style = MaterialTheme.typography.labelMedium,

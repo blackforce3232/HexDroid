@@ -8550,6 +8550,16 @@ if (code == "442") {
                 }
             }
             is IrcEvent.ChatMessage -> {
+                val handlerElapsedMs = SystemClock.elapsedRealtime()
+        if (ev.ingressElapsedMs > 0L) {
+            val queueDelayMs = (handlerElapsedMs - ev.ingressElapsedMs).coerceAtLeast(0L)
+            if (queueDelayMs >= 1000L) {
+                        android.util.Log.w(
+                            "HexDroidLatency",
+                            "event_queue_delay=${queueDelayMs}ms net=$netId from=${ev.from} target=${ev.target} history=${ev.isHistory}"
+                        )
+                    }
+                }
                 // Bot Mode: a `bot`-tagged message is proof the sender is a bot; remember it
                 // so the member list and nick sheet can badge them even before a WHO.
                 if (ev.fromBot) markBotInState(netId, ev.from)

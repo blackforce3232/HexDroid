@@ -57,7 +57,12 @@ data class RemoteNickStylesSnapshot(
     fun specialRule(nick: String): SpecialNickRule? = special[ircFoldNick(nick)]
     fun bfRule(nick: String): BfNickRule? = bf[ircFoldNick(nick)]
     fun colorArgb(nick: String): Int? = bfRule(nick)?.colorArgb ?: specialRule(nick)?.colorArgb
-    fun profileImageUrl(nick: String): String? = profileImageUrls[ircFoldNick(nick)]
+    /** Legacy avatar URL for the requested display size (18 is used by the nick list). */
+    fun profileImageUrl(nick: String, size: Int = 18): String? {
+        val url = profileImageUrls[ircFoldNick(nick)] ?: return null
+        if (size == 18) return url
+        return url.replace(Regex("_18x18(?=\\.)"), "_${size}x${size}")
+    }
 }
 
 internal fun ircFoldNick(value: String): String = value.trim().trimStart('~', '&', '@', '%', '+')
