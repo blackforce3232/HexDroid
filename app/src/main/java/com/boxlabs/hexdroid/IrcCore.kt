@@ -20,7 +20,6 @@ package com.boxlabs.hexdroid
 
 import android.annotation.SuppressLint
 import android.os.SystemClock
-import android.os.SystemClock
 import com.boxlabs.hexdroid.connection.ConnectionConstants
 import com.boxlabs.hexdroid.connection.SocksProxy
 import com.boxlabs.hexdroid.data.AutoJoinChannel
