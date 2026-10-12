@@ -668,6 +668,8 @@ sealed class IrcEvent {
          * messages, where the content-fingerprint/consumeEchoIfMatch fallback still applies.
          */
         val label: String? = null,
+        /** Monotonic time immediately before offering this chat event to the flow. */
+        val emittedElapsedMs: Long = 0L,
     ) : IrcEvent()
 
 data class Notice(
@@ -2944,6 +2946,7 @@ class IrcClient(val config: IrcConfig) {
 												isAction = isAction,
 												timeMs = serverTimeMs,
 												ingressElapsedMs = ingressElapsedMs,
+												emittedElapsedMs = SystemClock.elapsedRealtime(),
 												isHistory = (playbackHistory || isHeuristicHistory(buf, serverTimeMs, nowMs)),
 								isChathistoryContext = msg.tags.containsKey("draft/chathistory-context"),
 								msgId = msg.tags["msgid"],

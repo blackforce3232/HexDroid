@@ -1695,6 +1695,7 @@ class IrcViewModel(
 
     private val notifier = NotificationHelper(appContext)
     private val logs = LogWriter(appContext)
+    private val latencyMetrics = LatencyMetrics()
     private val remoteNickStyles = RemoteNickStyles(appContext)
     private var nickStyleRefreshJob: Job? = null
 
@@ -2195,6 +2196,18 @@ class IrcViewModel(
     private val gracefulQuitHook: (onDone: () -> Unit) -> Boolean = ::onTaskRemovedGracefulQuit
 
     init {
+        // Diagnostics only: independent of Main so a busy UI does not also stall reporting.
+        // Lifecycle-bound; no message content or user identifiers are logged.
+        viewModelScope.launch(Dispatchers.Default) {
+            var windowStart = SystemClock.elapsedRealtime()
+            while (isActive) {
+                delay(10_000L)
+                val now = SystemClock.elapsedRealtime()
+                val summaries = latencyMetrics.drain()
+                summaries.forEach { android.util.Log.i("HexDroidLatency", it.logLine(now - windowStart)) }
+                windowStart = now
+            }
+        }
         _state.update { it.copy(remoteNickStyles = remoteNickStyles.snapshot()) }
         viewModelScope.launch {
             runCatching { remoteNickStyles.refreshIfStale() }
@@ -5300,11 +5313,45 @@ fun startAddNetwork() {
                         // drained, which makes us a "slow reader".
                         .buffer(capacity = EVENT_DRAIN_BUFFER_CAPACITY)
                         .collect { ev ->
+                        val collectedAt = SystemClock.elapsedRealtime()
+                        // Fixed labels survive release obfuscation; all other events remain measured.
+                        val eventKind = when (ev) {
+                            is IrcEvent.ChatMessage -> if (ev.isHistory) "ChatHistory" else "ChatLive"
+                            is IrcEvent.Names -> "Names"
+                            is IrcEvent.NamesEnd -> "NamesEnd"
+                            is IrcEvent.Joined -> "Joined"
+                            is IrcEvent.Parted -> "Parted"
+                            is IrcEvent.Quit -> "Quit"
+                            is IrcEvent.NickChanged -> "NickChanged"
+                            is IrcEvent.ChannelModeChanges -> "ChannelModeChanges"
+                            is IrcEvent.ChannelUserMode -> "ChannelUserMode"
+                            is IrcEvent.ChannelModeChanged -> "ChannelModeChanged"
+                            is IrcEvent.ChannelModeLine -> "ChannelModeLine"
+                            is IrcEvent.WhoxReply -> "WhoxReply"
+                            is IrcEvent.Notice -> "Notice"
+                            else -> "Other"
+                        }
                         // Handle events on Main: UI actions also write _state on Main, so every
                         // read-modify-write of _state happens on one thread. Handler throws are
                         // caught here; the outer try covers throws from the flow itself.
                         withContext(Dispatchers.Main.immediate) {
-                            runCatching { handleEvent(netId, ev) }
+                            val startedAt = SystemClock.elapsedRealtime()
+                            runCatching {
+                                try {
+                                    handleEvent(netId, ev)
+                                } finally {
+                                    val finishedAt = SystemClock.elapsedRealtime()
+                                    latencyMetrics.record("main_wait.$eventKind", startedAt - collectedAt)
+                                    latencyMetrics.record("handler.$eventKind", finishedAt - startedAt)
+                                    if (ev is IrcEvent.ChatMessage && ev.ingressElapsedMs > 0L) {
+                                        latencyMetrics.record("read_to_handler.$eventKind", startedAt - ev.ingressElapsedMs)
+                                        if (ev.emittedElapsedMs >= ev.ingressElapsedMs) {
+                                            latencyMetrics.record("core_prepare.$eventKind", ev.emittedElapsedMs - ev.ingressElapsedMs)
+                                            latencyMetrics.record("queue_wait.$eventKind", collectedAt - ev.emittedElapsedMs)
+                                        }
+                                    }
+                                }
+                            }
                                 .onFailure { t ->
                                     val msg = (t.message ?: t::class.java.simpleName)
                                     append(bufKey(netId, "*server*"), from = "CLIENT", text = appContext.getString(R.string.vm_event_handler_error, msg), isHighlight = true)
@@ -8550,16 +8597,6 @@ if (code == "442") {
                 }
             }
             is IrcEvent.ChatMessage -> {
-                val handlerElapsedMs = SystemClock.elapsedRealtime()
-        if (ev.ingressElapsedMs > 0L) {
-            val queueDelayMs = (handlerElapsedMs - ev.ingressElapsedMs).coerceAtLeast(0L)
-            if (queueDelayMs >= 1000L) {
-                        android.util.Log.w(
-                            "HexDroidLatency",
-                            "event_queue_delay=${queueDelayMs}ms net=$netId from=${ev.from} target=${ev.target} history=${ev.isHistory}"
-                        )
-                    }
-                }
                 // Bot Mode: a `bot`-tagged message is proof the sender is a bot; remember it
                 // so the member list and nick sheet can badge them even before a WHO.
                 if (ev.fromBot) markBotInState(netId, ev.from)
@@ -12037,6 +12074,7 @@ private fun nickRank(netId: String, display: String): Int {
 }
 
 private fun rebuildNicklist(netId: String, chanKey: String): List<String> {
+    val startedAt = SystemClock.elapsedRealtime()
     val baseMap = chanNickCase[chanKey].orEmpty()
     val modeMap = chanNickStatus[chanKey].orEmpty()
     val ps = prefixSymbols(netId)
@@ -12048,7 +12086,7 @@ private fun rebuildNicklist(netId: String, chanKey: String): List<String> {
         (sym?.toString() ?: "") + base
     }
 
-    return out.distinct().sortedWith(Comparator { a, b ->
+    val result = out.distinct().sortedWith(Comparator { a, b ->
         val ra = nickRank(netId, a)
         val rb = nickRank(netId, b)
         if (ra != rb) ra - rb
@@ -12058,6 +12096,13 @@ private fun rebuildNicklist(netId: String, chanKey: String): List<String> {
             casefoldText(netId, ba).compareTo(casefoldText(netId, bb))
         }
     })
+    val sizeGroup = when {
+        baseMap.size < 100 -> "lt100"
+        baseMap.size < 1000 -> "100to999"
+        else -> "ge1000"
+    }
+    latencyMetrics.record("nicklist.$sizeGroup", SystemClock.elapsedRealtime() - startedAt)
+    return result
 }
 
 private fun upsertNickInChannel(netId: String, chanKey: String, baseNick: String, modes: Set<Char>? = null) {
