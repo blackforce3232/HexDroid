@@ -42,6 +42,30 @@ Yerel JVM testleri çalıştırılmadı; GitHub Actions test/derleme sonucu bekl
 7. Mesaj yazarken ve listeyi kaydırırken akıcılığı kontrol et; kuyruk ölçümü gerçek
    çizim süresini ölçmez. Yetersizse ikinci aşama ayrı değerlendirilir.
 
+## İkinci ölçüm paketi — Other ayrıştırması ve collector dönüşü
+
+Bu pakette olay işleme davranışı değiştirilmedi. Önceki `Other` etiketi; Status,
+ServerText, liste olayları, typing, metadata, CTCP/DCC, reaksiyon ve benzeri
+yüksek hacimli olaylara ayrıldı. Sabit etiketler içerik, nick, kanal veya ağ
+kimliği taşımaz. Böylece hangi olay ailesinin yüzlerce kez işlendiği görülebilir.
+
+`collector_resume.<EventKind>` metriği, Main işleme bloğu tamamen döndükten sonra
+collector coroutine'inin devam ettiği ana kadar geçen dispatcher/scheduling
+süresidir. Bir sonraki olayın gelişini bekleme süresini içermez; ağ sessizliği ile
+işleme gecikmesini birbirine karıştırmaz. `main_wait` ve `handler` ile birlikte
+okunmalıdır:
+
+- `main_wait` yüksekse Main kuyruğu veya UI/Main üzerindeki başka iş yükü vardır.
+- `handler` yüksekse o olayın kendi state/render hazırlığı pahalıdır.
+- `collector_resume` yüksekse Main'den collector dispatcher'ına dönüş veya
+  coroutine scheduling gecikmesi vardır.
+- Üçü de düşükken `queue_wait.ChatLive` yüksekse olay collector buffer'ında bekliyordur.
+
+Yeni [LatencyEventClassifierTest.kt](app/src/test/java/com/boxlabs/hexdroid/LatencyEventClassifierTest.kt)
+bilinen yüksek hacimli event etiketlerinin `Other` altında kaybolmadığını test eder.
+`collector_resume` gerçek bir davranış değişikliği değildir; yalnızca sonraki cihaz
+ölçümü için eklenmiştir.
+
 ## Yeni ölçüm katmanı — 12 Ekim 2026
 
 **Aşağıdaki eski bulgular tarihsel notlardır.** Eski toplam gecikme ölçümü tek başına
@@ -71,6 +95,7 @@ Telefonun uykuya girmesi veya zamanlayıcı gecikmesi nedeniyle gerçek pencere 
 | queue_wait.ChatLive / ChatHistory | Üretim zaman damgasından kolektöre ulaşmaya kadar; gönderimde bekleme ve kolektör zamanlaması da dahil |
 | main_wait.* | Kolektöre girişten Main üzerindeki işleyicinin başlamasına kadar |
 | handler.* | Olay işleyicisinin çalışma süresi; erken dönüşler ve hatalı çıkışlar dahil, hata bildirimi hariç |
+| collector_resume.* | Main bloğu bittikten sonra collector coroutine'inin yeniden devam etme süresi; sonraki olayın gelişini içermez |
 | read_to_handler.ChatLive / ChatHistory | Eski toplam gecikmenin karşılığı; socket okuma → işleyici başlangıcı |
 | nicklist.lt100 / 100to999 / ge1000 | Kullanıcı sayısı grubuna göre nick listesi oluşturma ve sıralama süresi |
 
@@ -85,8 +110,9 @@ aşan yüzde 95 için gözlenen maksimum üst sınır olarak kullanılır. Örne
   Yerel echo, relay veya birleştirilmiş multiline gibi diğer üretim yolları bu zaman
   damgaları yoksa bu metriklere dahil edilmez; işleyici ve Main bekleme süreleri yine ölçülür.
 - Olay türleri release küçültmesinden etkilenmeyen sabit etiketlerdir. Sohbet, NAMES,
-  giriş/çıkış, QUIT, nick değişimi, bazı MODE olayları, WHOX ve NOTICE ayrılır;
-  diğer olaylar Other altında toplanır.
+  giriş/çıkış, QUIT, nick değişimi, MODE, WHOX, NOTICE, Status/ServerText, liste,
+  typing, metadata, CTCP/DCC ve reaksiyon olayları ayrılır; kapsanmayanlar Other
+  altında toplanır.
 - Nick listesi süresi olay işleyicisinin içinde olabilir; bu iki süre toplanmamalıdır.
 - Kuyruk beklemesinin büyümesi, önceki yavaş olayların veya önceki Main beklemelerinin
   birikmesi olabilir. Yalnızca son mesajın Main beklemesine bakarak UI yükü dışlanamaz.

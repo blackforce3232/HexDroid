@@ -5315,25 +5315,11 @@ fun startAddNetwork() {
                         .collect { ev ->
                         val collectedAt = SystemClock.elapsedRealtime()
                         // Fixed labels survive release obfuscation; all other events remain measured.
-                        val eventKind = when (ev) {
-                            is IrcEvent.ChatMessage -> if (ev.isHistory) "ChatHistory" else "ChatLive"
-                            is IrcEvent.Names -> "Names"
-                            is IrcEvent.NamesEnd -> "NamesEnd"
-                            is IrcEvent.Joined -> "Joined"
-                            is IrcEvent.Parted -> "Parted"
-                            is IrcEvent.Quit -> "Quit"
-                            is IrcEvent.NickChanged -> "NickChanged"
-                            is IrcEvent.ChannelModeChanges -> "ChannelModeChanges"
-                            is IrcEvent.ChannelUserMode -> "ChannelUserMode"
-                            is IrcEvent.ChannelModeChanged -> "ChannelModeChanged"
-                            is IrcEvent.ChannelModeLine -> "ChannelModeLine"
-                            is IrcEvent.WhoxReply -> "WhoxReply"
-                            is IrcEvent.Notice -> "Notice"
-                            else -> "Other"
-                        }
+                        val eventKind = latencyEventKind(ev)
                         // Handle events on Main: UI actions also write _state on Main, so every
                         // read-modify-write of _state happens on one thread. Handler throws are
                         // caught here; the outer try covers throws from the flow itself.
+                        var mainFinishedAt = collectedAt
                         withContext(Dispatchers.Main.immediate) {
                             val startedAt = SystemClock.elapsedRealtime()
                             runCatching {
@@ -5357,6 +5343,14 @@ fun startAddNetwork() {
                                     append(bufKey(netId, "*server*"), from = "CLIENT", text = appContext.getString(R.string.vm_event_handler_error, msg), isHighlight = true)
                                 }
                         }
+                        mainFinishedAt = SystemClock.elapsedRealtime()
+                        // This line runs after Main handling has completed and the collector has
+                        // resumed on its IO dispatcher. It measures dispatcher resumption/scheduling
+                        // overhead only; it deliberately does not include time until a next event.
+                        latencyMetrics.record(
+                            "collector_resume.$eventKind",
+                            SystemClock.elapsedRealtime() - mainFinishedAt,
+                        )
                     }
                 } catch (ce: kotlinx.coroutines.CancellationException) {
                     throw ce
