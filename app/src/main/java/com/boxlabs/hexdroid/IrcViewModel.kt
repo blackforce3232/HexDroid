@@ -8358,7 +8358,7 @@ if (code == "442") {
 
 
                     // Update nicklists for this network (multi-status safe).
-                    moveNickAcrossChannels(netId, ev.oldNick, ev.newNick)
+                    val renamedChannels = moveNickAcrossChannels(netId, ev.oldNick, ev.newNick)
 
                     // Transfer away state from old nick to new nick.
                     val awayMap = nickAwayState[netId]
@@ -8372,6 +8372,7 @@ if (code == "442") {
                     // channel the nick is in shows the new nick.
                     val rebuilt = chanNickCase.keys
                         .filter { it.startsWith("$netId::") }
+                        .filter { it in renamedChannels || it !in st1.nicklists }
                         .associateWith { rebuildNicklist(netId, it) }
                     val updatedNicklists = st1.nicklists + rebuilt
 
@@ -8938,7 +8939,6 @@ if (code == "442") {
                         val chanKey = resolveBufferKey(netId, ev.channel)
                         ensureBuffer(chanKey)
                         applyNamesSnapshot(netId, chanKey, req.names.toList())
-                        rebuildNicklist(netId, chanKey)
                     } else {
                         val ps = prefixSymbols(netId)
                         req.names.sortedWith(
@@ -9341,7 +9341,7 @@ if (code == "442") {
                 // covers clock skew). A replayed QUIT is from before the member lists the
                 // server sent on join: someone listed now came back since.
                 val st1 = _state.value
-                val mutatedKeys = mutableListOf<String>()
+                val mutatedKeys = mutableSetOf<String>()
                 if (affectLive) {
                     // The nick is back in the pool, so whatever draft/metadata-2 values it
                     // carried describe someone who is no longer here. Left behind, they are
@@ -9349,8 +9349,11 @@ if (code == "442") {
                     dropMetadataForNick(netId, ev.nick)
                     val keys = st1.nicklists.keys.filter { it.startsWith("$netId::") }
                     for (k in keys) {
+                        // Preserve removal/AGE callbacks, but don't sort an unchanged channel.
+                        // Include rendered membership as a fallback for an out-of-sync snapshot.
+                        val changed = chanNickCase[k]?.containsKey(foldedNick) == true || k in affected
                         removeNickFromChannel(netId, k, ev.nick)
-                        mutatedKeys.add(k)
+                        if (changed) mutatedKeys.add(k)
                     }
                 }
                 if (mutatedKeys.isNotEmpty() || affectLive) {
@@ -12086,16 +12089,11 @@ private fun rebuildNicklist(netId: String, chanKey: String): List<String> {
         (sym?.toString() ?: "") + base
     }
 
-    val result = out.distinct().sortedWith(Comparator { a, b ->
-        val ra = nickRank(netId, a)
-        val rb = nickRank(netId, b)
-        if (ra != rb) ra - rb
-        else {
-            val ba = a.trimStart(*prefixChars)
-            val bb = b.trimStart(*prefixChars)
-            casefoldText(netId, ba).compareTo(casefoldText(netId, bb))
-        }
-    })
+    val result = orderNickDisplays(
+        out,
+        rank = { nickRank(netId, it) },
+        foldedBase = { casefoldText(netId, it.trimStart(*prefixChars)) },
+    )
     val sizeGroup = when {
         baseMap.size < 100 -> "lt100"
         baseMap.size < 1000 -> "100to999"
@@ -12128,25 +12126,26 @@ private fun removeNickFromChannel(netId: String, chanKey: String, nick: String) 
     ageBridges[netId]?.onMemberLeft(chanKey.removePrefix("$netId::"), nick)
 }
 
-private fun setNicklistState(netId: String, chanKey: String) {
+private fun setNicklistState(netId: String, chanKey: String): List<String> {
     val st = _state.value
     val rebuilt = rebuildNicklist(netId, chanKey)
     _state.value = syncActiveNetworkSummary(st.copy(nicklists = st.nicklists + (chanKey to rebuilt)))
+    return rebuilt
 }
 
-private fun applyNamesDelta(netId: String, chanKey: String, names: List<String>) {
+private fun applyNamesDelta(netId: String, chanKey: String, names: List<String>): List<String> {
     for (raw in names) {
         val (base, modes) = parseNickWithPrefixes(netId, raw)
         if (base.isBlank()) continue
         upsertNickInChannel(netId, chanKey, baseNick = base, modes = modes)
     }
-    setNicklistState(netId, chanKey)
+    return setNicklistState(netId, chanKey)
 }
 
-private fun applyNamesSnapshot(netId: String, chanKey: String, names: List<String>) {
+private fun applyNamesSnapshot(netId: String, chanKey: String, names: List<String>): List<String> {
     chanNickCase[chanKey] = mutableMapOf()
     chanNickStatus[chanKey] = mutableMapOf()
-    applyNamesDelta(netId, chanKey, names)
+    return applyNamesDelta(netId, chanKey, names)
 }
 
 private fun updateUserMode(netId: String, chanKey: String, nick: String, prefixSym: Char?, adding: Boolean) {
@@ -12160,13 +12159,15 @@ private fun updateUserMode(netId: String, chanKey: String, nick: String, prefixS
     setNicklistState(netId, chanKey)
 }
 
-private fun moveNickAcrossChannels(netId: String, oldNick: String, newNick: String) {
+private fun moveNickAcrossChannels(netId: String, oldNick: String, newNick: String): Set<String> {
     val oldFold = casefoldText(netId, oldNick)
     val newFold = casefoldText(netId, newNick)
+    val changed = mutableSetOf<String>()
     val keys = chanNickCase.keys.filter { it.startsWith("$netId::") }
     for (k in keys) {
         val baseMap = chanNickCase[k] ?: continue
-        val base = baseMap.remove(oldFold) ?: continue
+        baseMap.remove(oldFold) ?: continue
+        changed.add(k)
         val modes = chanNickStatus[k]?.remove(oldFold)
         baseMap[newFold] = newNick
         if (modes != null) {
@@ -12174,6 +12175,7 @@ private fun moveNickAcrossChannels(netId: String, oldNick: String, newNick: Stri
             mm[newFold] = modes
         }
     }
+    return changed
 }
 
 

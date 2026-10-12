@@ -1,5 +1,47 @@
 # HexDroid Mesaj Gecikmesi Araştırması
 
+## İlk optimizasyon paketi — cihaz doğrulaması bekleniyor
+
+12 Ekim cihaz kayıtlarında canlı mesaj işleme ortalaması yaklaşık 1 ms iken kuyruk
+beklemesi 29 saniye ortalamaya, 30,5 saniye maksimuma ulaştı. Nick listesi
+oluşturma/sıralama süresi 10 saniyelik pencerelerde yaklaşık 5–6 saniyeydi.
+Bu duvar saati ölçümüdür, CPU yüzdesi değildir. Aktif kullanıcı scripti yoktu.
+
+Uygulanan değişiklikler:
+
+- Sıralama anahtarları karşılaştırma başına değil, farklı gösterim başına bir kez
+  hesaplanıyor. Aynı rank/casefold hesapları, tekrar temizleme ve kararlı sıralama
+  korunuyor. Kalıcı önbellek yok; sunucunun yetki/harf eşleme kuralları her çağrıda okunur.
+- NAMES tamamlanınca zaten oluşturulup yayımlanmış liste yeniden sıralanmadan döndürülüyor.
+- Nick değişiminde yalnız taşınan üyeliğin bulunduğu kanallar ve henüz ekran listesi
+  olmayan üyelik tabloları yeniden oluşturuluyor. Yetki taşıma mantığı değişmedi.
+- QUIT sırasında üyelik kaldırma ve AGE çağrıları korunuyor; üye bulunmayan,
+  ekran listesinde de ilgili nick olmayan kanallar tekrar sıralanmıyor.
+- Olay kuyruğu, Main üzerinde sıralı işleme, geçmiş olay korumaları, kick/mod işlemesi,
+  metadata ve özel sohbet işlemleri değiştirilmedi. Zamanlayıcılı liste yenileme yok.
+
+Yeni [NickListOrderingTest.kt](app/src/test/java/com/boxlabs/hexdroid/NickListOrderingTest.kt)
+testleri eski karşılaştırıcıyla farklı PREFIX/CASEMAPPING kurallarında aynı sonucu,
+eşit anahtarlarda kararlılığı ve anahtarların bir kez hesaplanmasını denetler.
+Liste girdileriyle yetki/nick/üyelik değişimi ve boş liste durumları da kapsanır.
+Bu testler tam ViewModel olay entegrasyonu testi değildir; çoklu ağ, geçmiş olayları,
+AGE ve yeniden bağlanma yan etkileri için cihaz doğrulaması hâlâ gereklidir.
+Yerel JVM testleri çalıştırılmadı; GitHub Actions test/derleme sonucu bekleniyor.
+
+### Yeni APK kabul kontrolü
+
+1. CI'da testDebugUnitTest ve assembleRelease görevlerini çalıştır.
+2. Aynı cihaz, kanallar, nick paneli ve geçmiş ayarlarıyla 3–5 dakika ölçüm al.
+3. Kuyruk gecikmesinin sürekli büyümediğini ve nick listesi sürelerinin azaldığını kontrol et.
+4. İkinci istemciyle giriş → op/voice verme → yetki alma → nick değiştirme → kick
+   sırasını dene. Listede simge, konum ve üyelik doğru kalmalı; yeniden giriş de çalışmalı.
+5. Birden fazla ortak kanaldaki kullanıcı QUIT edince hepsinden silinmeli; ilgisiz
+   kanal ve aynı nickin bulunduğu başka ağ etkilenmemeli.
+6. Yalnız harf büyüklüğü değişen nick, özel sohbet penceresinin ad değiştirmesi,
+   bağlantı kesip yeniden bağlanma ve geçmiş oynatımı davranışlarını kontrol et.
+7. Mesaj yazarken ve listeyi kaydırırken akıcılığı kontrol et; kuyruk ölçümü gerçek
+   çizim süresini ölçmez. Yetersizse ikinci aşama ayrı değerlendirilir.
+
 ## Yeni ölçüm katmanı — 12 Ekim 2026
 
 **Aşağıdaki eski bulgular tarihsel notlardır.** Eski toplam gecikme ölçümü tek başına
