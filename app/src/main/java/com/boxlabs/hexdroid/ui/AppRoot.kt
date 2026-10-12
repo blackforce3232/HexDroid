@@ -287,6 +287,7 @@ fun AppRoot(
                     onEnterFloating = mainActivity?.let { act -> { act.toggleFloatingWindow() } },
                     onToggleBufferList = vm::toggleBufferList,
                     onToggleNickList = vm::toggleNickList,
+                    onTogglePrivateMessages = vm::togglePrivateMessages,
                     onToggleChannelsOnly = vm::toggleChannelsOnly,
                     onWhois = vm::whois,
                     onIgnoreNick = vm::ignoreNick,

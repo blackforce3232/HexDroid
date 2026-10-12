@@ -456,6 +456,12 @@
     <string name="chat_text_formatting">Metin biçimlendirme</string>
     <string name="chat_send_message">Mesaj gönder</string>
     <string name="chat_user_list">Kullanıcı listesi</string>
+    <string name="chat_private_messages">Özel mesajlar</string>
+    <string name="chat_private_messages_open">Özel mesaj listesini aç</string>
+    <string name="chat_private_messages_close">Özel Mesajları Kapat</string>
+    <string name="chat_private_messages_enable">Özel Mesajları Aç</string>
+    <string name="chat_private_messages_pending">Özel mesaj modu güncelleniyor…</string>
+    <string name="chat_private_messages_empty">Açık özel mesaj konuşması yok</string>
     <string name="chat_drag_reorder">Yeniden sıralamak için sürükle</string>
     <string name="chat_clear_all">Tümünü temizle</string>
 

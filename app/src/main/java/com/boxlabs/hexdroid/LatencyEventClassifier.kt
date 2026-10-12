@@ -40,6 +40,7 @@ internal fun latencyEventKind(ev: IrcEvent): String = when (ev) {
     is IrcEvent.CtcpReply -> "CtcpReply"
     is IrcEvent.CtcpRequest -> "CtcpRequest"
     is IrcEvent.CtcpExchange -> "CtcpExchange"
+    is IrcEvent.OwnUserModeChanged -> "OwnUserModeChanged"
     is IrcEvent.DccOfferEvent -> "DccOffer"
     is IrcEvent.DccChatOfferEvent -> "DccChatOffer"
     is IrcEvent.DccResumeRequest -> "DccResume"

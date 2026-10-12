@@ -721,6 +721,8 @@ data class Notice(
     data class YoureOper(val message: String) : IrcEvent()
     /** User MODE -o/-O received on our own nick — de-opered */
     object YoureDeOpered : IrcEvent()
+    /** A user-mode delta received for our own nick (for example +D/-D). */
+    data class OwnUserModeChanged(val modes: String) : IrcEvent()
     /** ChannelModeChanged — live MODE change on a channel (not 324 snapshot) */
     data class ChannelModeChanged(val channel: String, val modes: String) : IrcEvent()
 
@@ -3349,6 +3351,9 @@ class IrcClient(val config: IrcConfig) {
 												send(IrcEvent.YoureDeOpered)
 											}
 										}
+										'D' -> send(IrcEvent.OwnUserModeChanged(
+											(if (adding) "+" else "-") + "D"
+										))
 									}
 								}
 							}

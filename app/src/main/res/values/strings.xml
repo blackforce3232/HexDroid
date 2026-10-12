@@ -458,6 +458,12 @@
     <string name="chat_text_formatting">Text formatting</string>
     <string name="chat_send_message">Send message</string>
     <string name="chat_user_list">User list</string>
+    <string name="chat_private_messages">Private messages</string>
+    <string name="chat_private_messages_open">Open private message list</string>
+    <string name="chat_private_messages_close">Close private messages</string>
+    <string name="chat_private_messages_enable">Enable private messages</string>
+    <string name="chat_private_messages_pending">Updating private-message mode…</string>
+    <string name="chat_private_messages_empty">No private message conversations</string>
     <string name="chat_drag_reorder">Drag to reorder</string>
     <string name="chat_clear_all">Clear all</string>
 

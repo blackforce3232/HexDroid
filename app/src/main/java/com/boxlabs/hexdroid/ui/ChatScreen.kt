@@ -128,6 +128,7 @@ import androidx.compose.material.icons.filled.MarkChatRead
 import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Warning
@@ -1174,6 +1175,7 @@ fun ChatScreen(
     onEnterFloating: (() -> Unit)? = null,
     onToggleBufferList: () -> Unit,
     onToggleNickList: () -> Unit,
+    onTogglePrivateMessages: (String) -> Unit = {},
     onToggleChannelsOnly: () -> Unit,
     onWhois: (String) -> Unit,
     onIgnoreNick: (String, String) -> Unit,
@@ -1744,6 +1746,7 @@ fun ChatScreen(
     }
 
     var showNickSheet by remember { mutableStateOf(false) }
+    var showPrivateMessagesSheet by rememberSaveable { mutableStateOf(false) }
 
     var showNickActions by remember { mutableStateOf(false) }
     /** Nick awaiting confirmation before DCC auto-accept is switched on; null when idle. */
@@ -3096,6 +3099,95 @@ fun ChatScreen(
                                     .copy(alpha = if (nicklistPressed) 0.6f else 1f),
                                 modifier = Modifier.size(accentGlyphSize)
                             )
+                        }
+                    }
+
+                    // Private-message list. This is separate from the channel switcher so PMs
+                    // remain easy to reach without mixing them into the channel tabs.
+                    Box {
+                        BarIconButton(
+                            size = accentBtnSize,
+                            onClick = { showPrivateMessagesSheet = true },
+                            initialFocus = false,
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Chat,
+                                contentDescription = stringResource(R.string.chat_private_messages_open),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(accentGlyphSize),
+                            )
+                        }
+                    }
+
+                    if (showPrivateMessagesSheet) {
+                        ModalBottomSheet(
+                            onDismissRequest = { showPrivateMessagesSheet = false },
+                            contentWindowInsets = { WindowInsets(0) },
+                        ) {
+                            val pmBuffers = state.buffers.entries
+                                .filter { (key, buffer) ->
+                                    val (bufferNet, name) = splitKey(key)
+                                    name != "*server*" && !name.startsWith("DCCCHAT:") &&
+                                        name.firstOrNull()?.let {
+                                            it in (state.connections[bufferNet]?.chanTypes ?: "#&!+")
+                                        } != true
+                                }
+                                .sortedBy { it.value.name.lowercase(Locale.ROOT) }
+                            val netId = selNetId
+                            val conn = state.connections[netId]
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .navigationBarsPadding()
+                                    .padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Text(stringResource(R.string.chat_private_messages), style = MaterialTheme.typography.titleMedium)
+                                if (conn != null) {
+                                    val disabled = conn.privateMessagesDisabled
+                                    val pending = conn.privateMessagesModePending
+                                    ListItem(
+                                        headlineContent = {
+                                            Text(
+                                                when {
+                                                    pending -> stringResource(R.string.chat_private_messages_pending)
+                                                    disabled == true -> stringResource(R.string.chat_private_messages_enable)
+                                                    else -> stringResource(R.string.chat_private_messages_close)
+                                                }
+                                            )
+                                        },
+                                        leadingContent = {
+                                            Icon(
+                                                if (disabled == true) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                                contentDescription = null,
+                                            )
+                                        },
+                                        modifier = Modifier.clickable(
+                                            enabled = conn.connected && !pending && disabled != null,
+                                        ) {
+                                            onTogglePrivateMessages(netId)
+                                        },
+                                    )
+                                    HorizontalDivider()
+                                }
+                                if (pmBuffers.isEmpty()) {
+                                    Text(stringResource(R.string.chat_private_messages_empty), style = MaterialTheme.typography.bodyMedium)
+                                } else {
+                                    pmBuffers.forEach { (key, buffer) ->
+                                        ListItem(
+                                            headlineContent = { Text(buffer.name) },
+                                            supportingContent = {
+                                                val count = buffer.unread + buffer.highlights
+                                                if (count > 0) Text(count.toString())
+                                            },
+                                            modifier = Modifier.clickable {
+                                                showPrivateMessagesSheet = false
+                                                onSelectBuffer(key)
+                                            },
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
 

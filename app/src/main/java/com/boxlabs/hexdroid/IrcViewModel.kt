@@ -430,6 +430,10 @@ data class NetConnState(
     val connecting: Boolean = false,
     val status: String = "Disconnected",
     val myNick: String = "me",
+    /** Server-confirmed private-message reception mode. Null means not known yet. */
+    val privateMessagesDisabled: Boolean? = null,
+    /** True while a +D/-D user-mode request is awaiting the server echo. */
+    val privateMessagesModePending: Boolean = false,
     val lagMs: Long? = null,
     /**
      * Server-advertised *list* channel modes (from ISUPPORT CHANMODES group 1).
@@ -2969,6 +2973,20 @@ class IrcViewModel(
         val st = _state.value
         _state.value = st.copy(showNickList = !st.showNickList)
         viewModelScope.launch { runCatching { repo.updateSettings { it.copy(defaultShowNickList = _state.value.showNickList) } } }
+    }
+
+    /** Request a server-confirmed +D/-D change for the selected network's own nick. */
+    fun togglePrivateMessages(netId: String) {
+        val conn = _state.value.connections[netId] ?: return
+        if (!conn.connected || conn.privateMessagesModePending || conn.privateMessagesDisabled == null) return
+        val rt = runtimes[netId] ?: return
+        val mode = if (conn.privateMessagesDisabled) "-D" else "+D"
+        setNetConn(netId) { it.copy(privateMessagesModePending = true) }
+        viewModelScope.launch {
+            if (runCatching { rt.client.sendRaw("MODE ${conn.myNick} $mode") }.isFailure) {
+                setNetConn(netId) { it.copy(privateMessagesModePending = false) }
+            }
+        }
     }
 
 	/**
@@ -7389,7 +7407,7 @@ fun startAddNetwork() {
                     // and "Trust this server too" buttons hide on the next render. Stashed
                     // actual-fp is dropped because it's now either in the trust set or has
                     // been superseded by a full reset.
-                    it.copy(connecting = false, connected = true, status = appContext.getString(R.string.vm_status_connected_to, ev.server), lagMs = null, tlsPinMismatch = false, tlsPinMismatchActualFp = null, tlsHostnameMismatchIdentities = null)
+                    it.copy(connecting = false, connected = true, status = appContext.getString(R.string.vm_status_connected_to, ev.server), lagMs = null, privateMessagesDisabled = false, privateMessagesModePending = false, tlsPinMismatch = false, tlsPinMismatchActualFp = null, tlsHostnameMismatchIdentities = null)
                 }
                 // Arm the history divider for this network's existing query buffers: bouncer
                 // playback delivers PMs without a JOIN, so the JOIN handler's arming doesn't cover
@@ -7897,6 +7915,17 @@ if (code == "442") {
             }
             is IrcEvent.YoureDeOpered -> {
                 setNetConn(netId) { it.copy(isIrcOper = false) }
+            }
+            is IrcEvent.OwnUserModeChanged -> {
+                val mode = ev.modes
+                when {
+                    mode == "+D" -> setNetConn(netId) {
+                        it.copy(privateMessagesDisabled = true, privateMessagesModePending = false)
+                    }
+                    mode == "-D" -> setNetConn(netId) {
+                        it.copy(privateMessagesDisabled = false, privateMessagesModePending = false)
+                    }
+                }
             }
 
             is IrcEvent.BanListItem -> {
