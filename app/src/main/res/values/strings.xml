@@ -636,7 +636,7 @@
     <string name="setting_line_spacing_normal">Normal</string>
     <string name="setting_line_spacing_relaxed">Relaxed</string>
     <string name="setting_nicklist_font_label">Nicklist text size</string>
-    <string name="setting_nicklist_font_desc">Adjusts the nicklist on top of its width. Widening the pane still enlarges the text.</string>
+    <string name="setting_nicklist_font_desc">Adjusts nicklist text independently of the general font size. Widening the pane still enlarges the nicks.</string>
     <string name="setting_log_internal">Internal storage</string>
     <string name="setting_logs_none">No logs saved yet</string>
     <string name="setting_logs_size">Logs use %1$s</string>

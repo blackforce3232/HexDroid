@@ -632,7 +632,7 @@
     <string name="setting_line_spacing_normal">Normal</string>
     <string name="setting_line_spacing_relaxed">Geniş</string>
     <string name="setting_nicklist_font_label">Kullanıcı listesi metin boyutu</string>
-    <string name="setting_nicklist_font_desc">Kullanıcı listesini genişliğinin yanı sıra ayarlar. Paneli genişletmek metni yine de büyütür.</string>
+    <string name="setting_nicklist_font_desc">Kullanıcı listesi yazı boyutunu genel yazı boyutundan bağımsız ayarlar. Paneli genişletmek nickleri yine büyütür.</string>
     <string name="setting_log_internal">Dahili depolama</string>
     <string name="setting_logs_none">Henüz kayıtlı günlük yok</string>
     <string name="setting_logs_size">Günlükler %1$s yer kaplıyor</string>

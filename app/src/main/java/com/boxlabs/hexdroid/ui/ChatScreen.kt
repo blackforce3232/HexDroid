@@ -170,6 +170,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.ripple
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -255,6 +256,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -2388,17 +2390,21 @@ fun ChatScreen(
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun NicklistContent(mod: Modifier = Modifier, nickPaneDp: Dp = Dp.Unspecified) {
-        // Linear ramp from 10 sp at the narrowest pane (70 dp) to 20 sp at the widest (280 dp)
-        //   70 dp  → 10.0 sp (portrait narrowest)
-        //  110 dp  → 11.9 sp (landscape min)
-        //  180 dp  → 15.2 sp
-        //  280 dp  → 20.0 sp (landscape max)
+        // AppRoot applies the general UI font scale via LocalDensity. Cancel only that
+        // multiplier for the nicklist; the device's accessibility font scale still applies.
+        val density = LocalDensity.current
+        val nicklistDensity = Density(
+            density = density.density,
+            fontScale = density.fontScale / state.settings.fontScale.coerceIn(0.60f, 1.50f),
+        )
+        CompositionLocalProvider(LocalDensity provides nicklistDensity) {
+        // Linear ramp from 12 sp at the narrowest pane (70 dp) to 22 sp at 280 dp.
         // The user offset shifts the whole ramp rather than replacing it, so widening
         // the pane still enlarges the text at any offset.
         val nickFontOffset = state.settings.nicklistFontOffset.coerceIn(-3, 4).toFloat()
         val nickFontSp = (
-            if (nickPaneDp == Dp.Unspecified) 14f
-            else (10f + (nickPaneDp.value - 70f) * (10f / 210f)).coerceIn(10f, 20f)
+            if (nickPaneDp == Dp.Unspecified) 16f
+            else (12f + (nickPaneDp.value - 70f) * (10f / 210f)).coerceIn(12f, 22f)
         ).plus(nickFontOffset).coerceAtLeast(8f)
         Column(mod.padding(horizontal = 6.dp, vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
             Text(
@@ -2493,6 +2499,8 @@ fun ChatScreen(
                         }
                         val bf = bfNickRule(cleaned)
                         val special = specialNickRule(cleaned)
+                        val rowNickFontSp = bf?.fontSizeSp?.coerceIn(9f, 24f)
+                            ?.plus(2f + nickFontOffset) ?: nickFontSp
                         val hasOwnColor = state.settings.ownNickColorInt != null && cleaned.lowercase() in allMyNicks
                         val nickGradient = if (state.settings.colorizeNicks && !hasOwnColor) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
                             Brush.linearGradient(colors.map { Color(it) })
@@ -2505,8 +2513,8 @@ fun ChatScreen(
                                     ?: if (bf != null || special?.bold == true) FontWeight.Bold else FontWeight.Normal,
                                 fontStyle = bf?.let { if (it.italic) FontStyle.Italic else FontStyle.Normal } ?: FontStyle.Normal,
                                 fontFamily = bf?.fontFamily?.let { loadedNickFonts[it] },
-                                fontSize = bf?.fontSizeSp?.coerceIn(9f, 24f)?.sp ?: nickFontSp.sp,
-                                lineHeight = (nickFontSp * 1.15f).sp,
+                                fontSize = rowNickFontSp.sp,
+                                lineHeight = (rowNickFontSp * 1.15f).sp,
                                 letterSpacing = bf?.letterSpacingSp?.coerceIn(0f, 4f)?.sp ?: androidx.compose.ui.unit.TextUnit.Unspecified,
                                 shadow = bf?.shadowColor?.let { shadowColor ->
                                     androidx.compose.ui.graphics.Shadow(Color(shadowColor), androidx.compose.ui.geometry.Offset(bf.shadowOffsetXDp, bf.shadowOffsetYDp), bf.shadowRadiusDp)
@@ -2533,6 +2541,7 @@ fun ChatScreen(
                 }
             }
         }
+        } // Nicklist-only font scale
     }
 
     // Fresh listState per buffer — each buffer independently remembers its scroll position.
@@ -3226,17 +3235,48 @@ fun ChatScreen(
                             ) {
                                 topTabKeys.forEachIndexed { index, tabKey ->
                                     val (tabNet, tabName) = splitKey(tabKey)
+                                    val isServerTab = tabName == "*server*"
+                                    val meta = state.buffers[tabKey]
+                                    val unread = meta?.unread ?: 0
+                                    val highlights = meta?.highlights ?: 0
                                     Tab(
                                         selected = index == selectedIndex,
                                         onClick = { onSelectBuffer(tabKey) },
                                         text = {
-                                            Text(
-                                                if (tabName == "*server*")
-                                                    state.networks.firstOrNull { it.id == tabNet }?.name ?: tabNet
-                                                else tabName,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                            )
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                            ) {
+                                                Text(
+                                                    if (isServerTab)
+                                                        state.networks.firstOrNull { it.id == tabNet }?.name ?: tabNet
+                                                    else tabName,
+                                                    modifier = Modifier.widthIn(max = 120.dp),
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                )
+                                                if (highlights > 0 || unread > 0) {
+                                                    Badge(
+                                                        containerColor = if (highlights > 0) MaterialTheme.colorScheme.error
+                                                            else MaterialTheme.colorScheme.secondary,
+                                                    ) {
+                                                        val count = if (highlights > 0) highlights else unread
+                                                        Text(if (count > 99) "99+" else "$count")
+                                                    }
+                                                }
+                                                if (!isServerTab) {
+                                                    IconButton(
+                                                        onClick = { onSend("/closekey $tabKey") },
+                                                        modifier = Modifier.size(28.dp).focusHighlight(CircleShape),
+                                                    ) {
+                                                        Icon(
+                                                            Icons.Default.Close,
+                                                            contentDescription = stringResource(R.string.chat_cd_close_label, tabName),
+                                                            modifier = Modifier.size(16.dp),
+                                                        )
+                                                    }
+                                                }
+                                            }
                                         },
                                     )
                                 }
@@ -4473,10 +4513,10 @@ fun ChatScreen(
                         )
                     )
                 }
-                val nickPaneW = (portraitScreenW * portraitNickFrac).coerceIn(
+                val nickPaneW = ((portraitScreenW * portraitNickFrac).coerceIn(
                     70.dp,
                     portraitScreenW * maxPortraitNickFrac
-                )
+                ) + 80.dp).coerceAtMost((portraitScreenW - 140.dp).coerceAtLeast(70.dp))
 
                 var portraitDragging by remember { mutableStateOf(false) }
                 val portraitDragSt = rememberDraggableState { dxPx ->
@@ -4648,7 +4688,10 @@ fun ChatScreen(
 
 
             val bufferPaneW = (screenW * bufferFrac).coerceIn(minBufferDp, maxBufferDp)
-            val nickPaneW = (screenW * nickFrac).coerceIn(minNickDp, maxNickDp)
+            val bufferSpace = if (state.showBufferList || tourWantsBuffers) bufferPaneW + 15.dp else 0.dp
+            // Add 80 dp even for widths already saved by the user; leave room for messages.
+            val nickPaneW = ((screenW * nickFrac).coerceIn(minNickDp, maxNickDp) + 80.dp)
+                .coerceAtMost((screenW - bufferSpace - 15.dp - 120.dp).coerceAtLeast(70.dp))
 
             // In split-pane mode (landscape), keep side panes above the global input bar.
             // Scaffold's padding already accounts for top/bottom bars.
