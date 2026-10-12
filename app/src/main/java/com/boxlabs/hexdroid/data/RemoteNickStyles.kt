@@ -50,11 +50,14 @@ data class BfNickRule(
 data class RemoteNickStylesSnapshot(
     val special: Map<String, SpecialNickRule> = emptyMap(),
     val bf: Map<String, BfNickRule> = emptyMap(),
+    /** Legacy Geveze profile images keyed by IRC-folded nick. */
+    val profileImageUrls: Map<String, String> = emptyMap(),
     val fetchedAtMs: Long = 0L,
 ) {
     fun specialRule(nick: String): SpecialNickRule? = special[ircFoldNick(nick)]
     fun bfRule(nick: String): BfNickRule? = bf[ircFoldNick(nick)]
     fun colorArgb(nick: String): Int? = bfRule(nick)?.colorArgb ?: specialRule(nick)?.colorArgb
+    fun profileImageUrl(nick: String): String? = profileImageUrls[ircFoldNick(nick)]
 }
 
 internal fun ircFoldNick(value: String): String = value.trim().trimStart('~', '&', '@', '%', '+')
@@ -90,7 +93,9 @@ class RemoteNickStyles(private val context: Context) {
             // Optional BF assets may be unavailable independently of the special nick list.
             val bfNickDb = runCatching { fetch(urls[4]) }.getOrDefault("")
             val bfCss = runCatching { fetch(urls[5]) }.getOrDefault("")
+            val profileList = runCatching { fetch("https://irc.geveze.org/bf/ozelnicklist.js") }.getOrDefault("")
             val special = parseSpecialNicks(settings)
+            val profileImages = parseProfileImages(profileList)
             val bfNames = parseNickStyles(bfNickDb)
             val bfStyleIds = parseDesigns(bfCss)
             val colors = parseCssColors(bfCss)
@@ -121,7 +126,7 @@ class RemoteNickStyles(private val context: Context) {
                 )
             }.toMap()
             if (special.isEmpty()) throw IllegalArgumentException("Uzak özel nick yapılandırması boş veya tanınmayan biçimde")
-            val next = RemoteNickStylesSnapshot(special, bf, System.currentTimeMillis())
+            val next = RemoteNickStylesSnapshot(special, bf, profileImages, System.currentTimeMillis())
             current = next
             prefs.edit().putString("snapshot", encode(next)).apply()
             next
@@ -165,13 +170,16 @@ class RemoteNickStyles(private val context: Context) {
             .put("shadowColor", r.shadowColor).put("shadowRadius", r.shadowRadiusDp)
             .put("shadowDx", r.shadowOffsetXDp).put("shadowDy", r.shadowOffsetYDp))
         }
-        return root.put("special", special).put("bf", bf).toString()
+        val profiles = JSONObject()
+        s.profileImageUrls.forEach { (nick, url) -> profiles.put(nick, url) }
+        return root.put("special", special).put("bf", bf).put("profiles", profiles).toString()
     }
 
     private fun decode(raw: String): RemoteNickStylesSnapshot {
         val root = JSONObject(raw)
         val special = root.optJSONObject("special") ?: JSONObject()
         val bf = root.optJSONObject("bf") ?: JSONObject()
+        val profiles = root.optJSONObject("profiles") ?: JSONObject()
         return RemoteNickStylesSnapshot(
             special.keys().asSequence().asIterable().associate { nick ->
                 val v = special.getJSONObject(nick); ircFoldNick(nick) to SpecialNickRule(v.getInt("color"), v.optBoolean("bold"))
@@ -191,6 +199,7 @@ class RemoteNickStyles(private val context: Context) {
                     v.optDouble("shadowDy", 0.0).toFloat().coerceIn(-8f, 8f),
                 )
             },
+            profiles.keys().asSequence().asIterable().associate { nick -> ircFoldNick(nick) to profiles.getString(nick) },
             root.optLong("fetchedAt"),
         )
     }
@@ -214,6 +223,22 @@ class RemoteNickStyles(private val context: Context) {
         fun parseNickStyles(js: String): Map<String, Int> {
             val body = Regex("(?s)var\\s+nickStyles\\s*=\\s*\\{(.*?)\\}").find(js)?.groupValues?.get(1) ?: return emptyMap()
             return nickStyleEntry.findAll(body).associate { ircFoldNick(it.groupValues[1]) to it.groupValues[2].toInt() }
+        }
+
+        /** Parse the data-only legacy `OzelNicklerim` object without executing JavaScript. */
+        fun parseProfileImages(js: String): Map<String, String> {
+            val entry = Regex("\\\"([^\\\"]{1,64})\\\"\\s*:\\s*\\[\\s*\\\"([^\\\"]{1,160})\\\"")
+            return entry.findAll(js).mapNotNull { m ->
+                val nick = ircFoldNick(m.groupValues[1])
+                val file = m.groupValues[2]
+                if (!file.matches(Regex("[A-Za-z0-9_.-]+\\.(?:png|jpe?g|gif|webp)", RegexOption.IGNORE_CASE))) return@mapNotNull null
+                nick to "https://irc.geveze.org/bf/bfimg/${profileImageVariant(file)}"
+            }.toMap()
+        }
+
+        private fun profileImageVariant(file: String): String {
+            val dot = file.lastIndexOf('.')
+            return if (dot > 0) file.substring(0, dot) + "_18x18" + file.substring(dot) else file
         }
 
         fun parseDesigns(js: String): Map<Int, List<String>> {

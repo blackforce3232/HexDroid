@@ -1274,6 +1274,18 @@ fun ChatScreen(
     fun nickPrefix(display: String): Char? =
         display.firstOrNull()?.takeIf { it in nickPrefixChars }
 
+    data class NickRole(val label: String, val iconRes: Int)
+
+    fun nickRole(display: String): NickRole {
+        return when (nickPrefix(display)) {
+            '~' -> NickRole("Founder", R.drawable.nick_role_founder)
+            '&' -> NickRole("Soperatör", R.drawable.nick_role_sop)
+            '@' -> NickRole("Operatör", R.drawable.nick_role_op)
+            '%' -> NickRole("Halfop", R.drawable.nick_role_halfop)
+            else -> NickRole("Kullanıcı", R.drawable.nick_role_user)
+        }
+    }
+
     fun netName(netId: String): String =
         state.networks.firstOrNull { it.id == netId }?.name ?: netId
 
@@ -2398,14 +2410,16 @@ fun ChatScreen(
             fontScale = density.fontScale / state.settings.fontScale.coerceIn(0.60f, 1.50f),
         )
         CompositionLocalProvider(LocalDensity provides nicklistDensity) {
-        // Linear ramp from 12 sp at the narrowest pane (70 dp) to 22 sp at 280 dp.
+        // Reference nicklist sizing: 16sp on normal screens and 14sp on compact/mobile
+        // layouts, while retaining the app's width-based scaling for resizable panes.
         // The user offset shifts the whole ramp rather than replacing it, so widening
         // the pane still enlarges the text at any offset.
         val nickFontOffset = state.settings.nicklistFontOffset.coerceIn(-3, 4).toFloat()
+        val referenceFontSp = if (cfg.screenWidthDp <= 1024) 14f else 16f
         val nickFontSp = (
-            if (nickPaneDp == Dp.Unspecified) 16f
-            else (12f + (nickPaneDp.value - 70f) * (10f / 210f)).coerceIn(12f, 22f)
-        ).plus(nickFontOffset).coerceAtLeast(8f)
+            if (nickPaneDp == Dp.Unspecified) 15f
+            else (11f + (nickPaneDp.value - 70f) * (9f / 210f)).coerceIn(11f, 20f)
+        ).plus(nickFontOffset).coerceAtLeast(8f).let { maxOf(it, referenceFontSp - 2f) }
         Column(mod.padding(horizontal = 6.dp, vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
             Text(
                 text = pluralStringResource(R.plurals.chat_nicklist_users, nicklist.size, nicklist.size),
@@ -2428,11 +2442,13 @@ fun ChatScreen(
             LazyColumn(Modifier.fillMaxSize()) {
                 items(nicklist) { n ->
                     val cleaned = baseNick(n)
+                    val role = nickRole(n)
                     val nickDisplayName = metadataDisplayNames[cleaned.lowercase()]
                         ?.takeIf { !it.equals(cleaned, ignoreCase = true) }
                     val isAway = awayNicks.contains(cleaned.lowercase())
                     val isBot = botNicks.contains(cleaned.lowercase())
-                    val nickAvatar = metadataAvatars[cleaned.lowercase()]
+                    val legacyProfileAvatar = state.remoteNickStyles.profileImageUrl(cleaned)
+                    val nickAvatar = metadataAvatars[cleaned.lowercase()] ?: legacyProfileAvatar
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -2463,9 +2479,9 @@ fun ChatScreen(
                         if (nickAvatar != null) {
                             var avatarBmp by remember(nickAvatar) { mutableStateOf(RemoteImage.cached(nickAvatar)) }
                             LaunchedEffect(nickAvatar) { if (avatarBmp == null) avatarBmp = RemoteImage.fetch(nickAvatar) }
-                            avatarBmp?.let { bmp ->
+                            if (avatarBmp != null) {
                                 Image(
-                                    bitmap = bmp,
+                                    bitmap = avatarBmp!!,
                                     contentDescription = null,
                                     filterQuality = FilterQuality.High,
                                     contentScale = ContentScale.Crop,
@@ -2475,32 +2491,35 @@ fun ChatScreen(
                                         .clip(CircleShape)
                                         .alpha(if (isAway) 0.6f else 1f),
                                 )
-                            } ?: Spacer(Modifier.width(avatarSize + avatarGap))
-                        } else if (state.settings.showNickIcons) {
-                            // No avatar, so the slot carries presence instead of standing
-                            // empty: red for away, green for here.
-                            Box(
-                                modifier = Modifier
-                                    .padding(end = avatarGap)
-                                    .size(avatarSize),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Box(
-                                    Modifier
-                                        .size(avatarSize * 0.5f)
-                                        .clip(CircleShape)
-                                        .background(
-                                            if (isAway) Color(0xFFD05A5A) else Color(0xFF5AB77B)
-                                        )
+                            } else {
+                                Image(
+                                    painter = painterResource(role.iconRes),
+                                    contentDescription = role.label,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .padding(end = avatarGap)
+                                        .size(avatarSize)
+                                        .alpha(if (isAway) 0.6f else 1f),
                                 )
                             }
-                        } else if (metadataAvatars.isNotEmpty()) {
-                            Spacer(Modifier.width(avatarSize + avatarGap))
+                        } else {
+                            // Every member gets a role icon when no profile image is available.
+                            // This intentionally does not depend on the optional presence-icon
+                            // setting: role/status identity is part of the member list itself.
+                            Image(
+                                painter = painterResource(role.iconRes),
+                                contentDescription = role.label,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .padding(end = avatarGap)
+                                    .size(avatarSize)
+                                    .alpha(if (isAway) 0.6f else 1f),
+                            )
                         }
                         val bf = bfNickRule(cleaned)
                         val special = specialNickRule(cleaned)
                         val rowNickFontSp = bf?.fontSizeSp?.coerceIn(9f, 24f)
-                            ?.plus(2f + nickFontOffset) ?: nickFontSp
+                            ?.plus(1f + nickFontOffset) ?: nickFontSp
                         val hasOwnColor = state.settings.ownNickColorInt != null && cleaned.lowercase() in allMyNicks
                         val nickGradient = if (state.settings.colorizeNicks && !hasOwnColor) bf?.gradientColors?.takeIf { it.size >= 2 }?.let { colors ->
                             Brush.linearGradient(colors.map { Color(it) })
@@ -4516,7 +4535,7 @@ fun ChatScreen(
                 val nickPaneW = ((portraitScreenW * portraitNickFrac).coerceIn(
                     70.dp,
                     portraitScreenW * maxPortraitNickFrac
-                ) + 80.dp).coerceAtMost((portraitScreenW - 140.dp).coerceAtLeast(70.dp))
+                ) + 40.dp).coerceAtMost((portraitScreenW - 140.dp).coerceAtLeast(70.dp))
 
                 var portraitDragging by remember { mutableStateOf(false) }
                 val portraitDragSt = rememberDraggableState { dxPx ->
@@ -4689,8 +4708,8 @@ fun ChatScreen(
 
             val bufferPaneW = (screenW * bufferFrac).coerceIn(minBufferDp, maxBufferDp)
             val bufferSpace = if (state.showBufferList || tourWantsBuffers) bufferPaneW + 15.dp else 0.dp
-            // Add 80 dp even for widths already saved by the user; leave room for messages.
-            val nickPaneW = ((screenW * nickFrac).coerceIn(minNickDp, maxNickDp) + 80.dp)
+            // Add 40 dp even for widths already saved by the user; leave room for messages.
+            val nickPaneW = ((screenW * nickFrac).coerceIn(minNickDp, maxNickDp) + 40.dp)
                 .coerceAtMost((screenW - bufferSpace - 15.dp - 120.dp).coerceAtLeast(70.dp))
 
             // In split-pane mode (landscape), keep side panes above the global input bar.
@@ -6291,7 +6310,8 @@ fun ChatScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val sheetBase = selectedNick.lowercase()
-                    val sheetAvatar = metadataAvatars[sheetBase]
+                    val sheetAvatar = metadataAvatars[sheetBase] ?: state.remoteNickStyles.profileImageUrl(selectedNick)
+                    val sheetRole = nickRole(nickDisplayByBase[sheetBase] ?: selectedNick)
                     val sheetDisplayName = metadataDisplayNames[sheetBase]
                         ?.takeIf { !it.equals(selectedNick, ignoreCase = true) }
                     val sheetStatus = metadataStatuses[sheetBase]
@@ -6309,18 +6329,37 @@ fun ChatScreen(
                         if (sheetAvatar != null) {
                             var bmp by remember(sheetAvatar) { mutableStateOf(RemoteImage.cached(sheetAvatar)) }
                             LaunchedEffect(sheetAvatar) { if (bmp == null) bmp = RemoteImage.fetch(sheetAvatar) }
-                            bmp?.let {
+                            if (bmp != null) {
                                 Image(
-                                    bitmap = it,
+                                    bitmap = bmp!!,
                                     contentDescription = null,
                                     filterQuality = FilterQuality.High,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.size(44.dp).clip(CircleShape),
                                 )
+                            } else {
+                                Image(
+                                    painter = painterResource(sheetRole.iconRes),
+                                    contentDescription = sheetRole.label,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier.size(44.dp),
+                                )
                             }
+                        } else {
+                            Image(
+                                painter = painterResource(sheetRole.iconRes),
+                                contentDescription = sheetRole.label,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.size(44.dp),
+                            )
                         }
                         Column {
                             Text(selectedNick, style = MaterialTheme.typography.titleLarge)
+                            Text(
+                                sheetRole.label,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                             if (sheetBot) {
                                 Text(
                                     stringResource(R.string.nick_bot),
@@ -6383,12 +6422,12 @@ fun ChatScreen(
                     val prefix = dispNick?.let { nickPrefix(it) }
                     if (prefix != null) {
                         val (badgeColor, badgeLabel) = when (prefix) {
-                            '~' -> Pair(Color(0xFFFF6B35), "owner")
-                            '&' -> Pair(Color(0xFFE63946), "admin")
-                            '@' -> Pair(Color(0xFF2196F3), "op")
-                            '%' -> Pair(Color(0xFF4CAF50), "halfop")
-                            '+' -> Pair(Color(0xFF9E9E9E), "voice")
-                            else -> Pair(MaterialTheme.colorScheme.surfaceVariant, prefix.toString())
+                            '~' -> Pair(Color(0xFFFF6B35), "Founder")
+                            '&' -> Pair(Color(0xFFE63946), "Soperatör")
+                            '@' -> Pair(Color(0xFF2196F3), "Operatör")
+                            '%' -> Pair(Color(0xFF4CAF50), "Halfop")
+                            '+' -> Pair(Color(0xFF9E9E9E), "Kullanıcı")
+                            else -> Pair(MaterialTheme.colorScheme.surfaceVariant, "Kullanıcı")
                         }
                         Surface(
                             shape = RoundedCornerShape(4.dp),

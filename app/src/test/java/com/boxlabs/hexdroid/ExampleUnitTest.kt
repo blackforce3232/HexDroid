@@ -83,4 +83,13 @@ class ExampleUnitTest {
         assertEquals(0f, shadow?.dx)
         assertEquals(0f, shadow?.dy)
     }
+
+    @Test
+    fun legacyProfileImagesAreConvertedToSmallAvatarUrls() {
+        val parsed = RemoteNickStyles.parseProfileImages(
+            "var OzelNicklerim = { \"Alice\": [\"Alice_abc.JPG\"], \"Bad\": [\"bad image.jpg\"] };"
+        )
+        assertEquals("https://irc.geveze.org/bf/bfimg/Alice_abc_18x18.JPG", parsed["alice"])
+        assertFalse(parsed.containsKey("bad"))
+    }
 }
