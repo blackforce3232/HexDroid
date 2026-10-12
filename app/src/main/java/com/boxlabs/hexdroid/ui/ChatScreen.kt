@@ -7357,6 +7357,7 @@ private fun BarIconButton(
     size: Dp,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     initialFocus: Boolean = true,
     content: @Composable () -> Unit,
 ) {
@@ -7366,7 +7367,8 @@ private fun BarIconButton(
             .then(if (initialFocus) Modifier.tvInitialFocus() else Modifier)
             .focusHighlight(CircleShape)
             .clip(CircleShape)
-            .clickable(onClick = onClick),
+            .alpha(if (enabled) 1f else 0.38f)
+            .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) { content() }
 }
